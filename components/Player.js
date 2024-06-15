@@ -124,8 +124,14 @@ const Player = () => {
 
     // React to seek slider changes.
     const seek = (value) => {
+        // If the value is in range (probably unnecessary to check)...
         if(value >= 0 && value <= 1) {
+            /* Multiply the value from the slider (a float between 0 and 1) by the duration of the 
+               track as a percentage. The position value is always in milliseconds. Round down to 
+               avoid out of range error (probably unnecessary). */
             const milliseconds = Math.floor(duration * value);
+
+            // Set the playbackInstance position to the seek position.
             playbackInstance.setPositionAsync(milliseconds);
         }
     }
