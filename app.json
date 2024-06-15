@@ -2,7 +2,7 @@
   "expo": {
     "name": "tmc",
     "slug": "tmc",
-    "version": "1.0.0",
+    "version": "7.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,16 +15,41 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.themusicclass.ios",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Allow TMC to use FaceID.",
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.themusicclass.ios",
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow TMC to use FaceID"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "00ff2cf9-9894-4593-ae8a-19cd3a3749f9"
+      }
     }
   }
 }
