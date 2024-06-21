@@ -26,7 +26,6 @@ const Styles = StyleSheet.create({
     appWrapper: {
         paddingTop: appPaddingTop,
         paddingBottom: appPaddingBottom,
-        flex: 1,
         flexBasis: 20,
         flexGrow: 10,
         flexShrink: 0,
@@ -34,11 +33,10 @@ const Styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         height: '100%',
-        width: '100%',
+        minWidth: '100%',
         flexBasis: 100
     },
     container: {
-        flex: 1,
         flexBasis: 20,
         flexGrow: 10,
         flexShrink: 0,
@@ -47,10 +45,13 @@ const Styles = StyleSheet.create({
         alignItems: 'center',
         height: '100%',
         width: '100%',
-        maxWidth: '100%',
+        minWidth: '100%',
         flexBasis: 100,
-        margin: margin,
         overflow: 'scroll'
+    },
+    scroll: {
+        width: '100%',
+        minWidth: '100%'
     },
     input: {
         height: 40,
@@ -88,19 +89,30 @@ const Styles = StyleSheet.create({
         borderWidth: 3,
         borderRadius: borderRadius
     },
+    padded: {
+        paddingLeft: padding,
+        paddingRight: padding
+    },
     listItem: {
         backgroundColor: greyLight,
         padding: padding,
         borderRadius: borderRadius,
         marginTop: margin,
-        display: 'flex',
-        flexDirection: 'row',
-        gap: padding,
         width: '100%',
         borderWidth: 2,
+        borderColor: greyDark,
         maxWidth: '100%',
-        flexShrink: 1,
+        minWidth: '100%',
         overflow: 'hidden'
+    },
+    listItemContent: {
+        display: 'flex',
+        flexDirection: 'row',
+        flexBasis: 20,
+        flex: 3,
+        flexGrow: 10,
+        gap: padding
+
     },
     pageTitle: {
         fontSize: 22,
@@ -112,6 +124,12 @@ const Styles = StyleSheet.create({
         fontWeight: 'bold',
         whiteSpace: 'wrap'
     },
+    player: {
+        width: '100%',
+        padding: padding,
+        borderTopWidth: 1,
+        borderTopColor: greyDark
+    },
     playerTitle: {
         fontSize: 18,
         fontWeight: 'bold',
@@ -122,7 +140,7 @@ const Styles = StyleSheet.create({
     playerControls: {
         display: 'flex',
         flexDirection: 'row',
-        gap: padding
+        gap: 30
     },
     listItemImage: {
         height: thumbnailSize,

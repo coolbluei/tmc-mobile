@@ -8,7 +8,7 @@ import Collections from "../screens/Collections";
 import ClassDates from "../screens/ClassDates";
 import Navbar from "./Navbar";
 import Styles from "../styles";
-import { SafeAreaView } from "react-native";
+import { View } from "react-native";
 import Entity from "../drupal/Entity";
 import Songs from "../screens/Songs";
 import Player from "./Player";
@@ -121,10 +121,10 @@ const Controller = (props) => {
     if(props.isAuthenticated) {
         content = (
             <>
-                <SafeAreaView style={Styles.container}>
+                <View style={Styles.container}>
                     {screens[destination]}
                     <Player />
-                </SafeAreaView>
+                </View>
                 <Navbar />
             </>
         );
