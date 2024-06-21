@@ -144,7 +144,10 @@ const Styles = StyleSheet.create({
     },
     listItemImage: {
         height: thumbnailSize,
-        width: thumbnailSize
+        width: thumbnailSize,
+        borderWidth: 1,
+        borderColor: greyDark,
+        borderRadius: borderRadius
     }
 });
 
