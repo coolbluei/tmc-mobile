@@ -102,8 +102,7 @@ const Styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: greyDark,
         maxWidth: '100%',
-        minWidth: '100%',
-        overflow: 'hidden'
+        minWidth: '100%'
     },
     listItemContent: {
         display: 'flex',
@@ -112,7 +111,6 @@ const Styles = StyleSheet.create({
         flex: 3,
         flexGrow: 10,
         gap: padding
-
     },
     pageTitle: {
         fontSize: 22,
@@ -122,7 +120,9 @@ const Styles = StyleSheet.create({
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        whiteSpace: 'wrap'
+        whiteSpace: 'wrap',
+        flexWrap: 'wrap',
+        flexShrink: 1
     },
     player: {
         width: '100%',
