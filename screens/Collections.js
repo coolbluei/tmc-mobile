@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
 import { collectionDataAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Collection from "../components/Collection";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const Collections = (props) => {
 
@@ -55,12 +54,12 @@ const Collections = (props) => {
     }
 
     return (
-        <SafeAreaView style={Styles.container}>
+        <View style={Styles.container}>
             <Text style={Styles.pageTitle}>My Music</Text>
-            <ScrollView>
+            <ScrollView contentContainerStyle={Styles.scroll}>
                 {collectionDataContent}
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
 

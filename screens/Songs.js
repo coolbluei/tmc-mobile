@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
 import { songDataAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Song from "../components/Song";
 
 const Songs = (props) => {
@@ -66,12 +65,12 @@ const Songs = (props) => {
     }
 
     return (
-        <SafeAreaView style={Styles.container}>
+        <View style={Styles.container}>
             <Text style={Styles.pageTitle}>{title}</Text>
-            <ScrollView>
+            <ScrollView contentContainerStyle={Styles.scroll}>
                 {songDataContent}
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 };
 

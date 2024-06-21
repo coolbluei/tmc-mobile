@@ -146,7 +146,7 @@ const Player = () => {
 
     if(isPlaying || typeof index === 'number') {
         content = (
-            <View style={{ width: '100%' }}>
+            <View style={Styles.player}>
                 <Text style={Styles.playerTitle}>{title}</Text>
                 <Slider style={{ width: '100%' }} value={position / duration} onSlidingComplete={seek} />
                 <View style={Styles.container}>

@@ -7,9 +7,10 @@ const AuthProvider = () => {
 
     const [api] = useAtom(apiAtom);
     const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
-    const [refreshToken, setRefreshToken] = useAtom(refreshTokenAtom)
+    const [refreshToken, setRefreshToken] = useAtom(refreshTokenAtom);
     const [needsRefresh, setNeedsRefresh] = useAtom(needsRefreshAtom);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
         let hasSession = false;
@@ -17,7 +18,7 @@ const AuthProvider = () => {
         if(api && accessToken) {
             hasSession = true;
 
-            if(needsRefresh) {
+            if(needsRefresh || !isInitialized) {
                 const refresh = async () => {
                     api.refresh()
                     .then((response) => {
@@ -33,6 +34,7 @@ const AuthProvider = () => {
                 };
 
                 refresh();
+                setIsInitialized(true);
             }
         }
 

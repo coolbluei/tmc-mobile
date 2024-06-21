@@ -20,12 +20,14 @@ const Song = (props) => {
     };
     
     return (
-        <TouchableHighlight style={Styles.listItem} onPress={play}>
-            <View>
-                <Image style={Styles.listItemImage} src={props.data.get('field_image').get('uri').url} />
-                <Text style={Styles.title}>{props.data.get('title')}</Text>
-            </View>
-        </TouchableHighlight>
+        <View style={Styles.padded}>
+            <TouchableHighlight style={Styles.listItem} onPress={play}>
+                <View style={Styles.listItemContent}>
+                    <Image style={Styles.listItemImage} src={props.data.get('field_image').get('uri').url} />
+                    <Text style={Styles.title}>{props.data.get('title')}</Text>
+                </View>
+            </TouchableHighlight>
+        </View>
     );
 };
 
