@@ -1,4 +1,4 @@
-import { apiAtom, credentialsAtom, pageIdAtom, userDataAtom, collectionDataAtom, classDateDataAtom, songDataAtom } from "../storage/atoms";
+import { apiAtom, credentialsAtom, isAuthenticatedAtom, pageIdAtom, userDataAtom, collectionDataAtom, classDateDataAtom, songDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
@@ -22,6 +22,7 @@ const Controller = (props) => {
     const [classDateData, setClassDateData] = useAtom(classDateDataAtom);
     const [songData, setSongData] = useAtom(songDataAtom)
     const [credentials] = useAtom(credentialsAtom);
+    const [isAuthenticated] = useAtom(isAuthenticatedAtom);
 
     let detailId = null;
     let destination = pageId;
@@ -118,7 +119,7 @@ const Controller = (props) => {
 
     let content = <LoginForm />;
 
-    if(props.isAuthenticated) {
+    if(isAuthenticated) {
         content = (
             <>
                 <View style={Styles.container}>

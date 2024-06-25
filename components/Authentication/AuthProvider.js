@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { accessTokenAtom, needsRefreshAtom, apiAtom, refreshTokenAtom } from "../../storage/atoms";
+import { accessTokenAtom, needsRefreshAtom, apiAtom, refreshTokenAtom, isAuthenticatedAtom } from "../../storage/atoms";
 import { useEffect, useState } from "react";
 import Controller from "../Controller";
 
@@ -9,7 +9,7 @@ const AuthProvider = () => {
     const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
     const [refreshToken, setRefreshToken] = useAtom(refreshTokenAtom);
     const [needsRefresh, setNeedsRefresh] = useAtom(needsRefreshAtom);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {

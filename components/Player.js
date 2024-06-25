@@ -7,6 +7,7 @@ import Slider from "@react-native-community/slider";
 import Styles from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBackward, faForward, faPause, faPlay, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { isAuthenticatedAtom } from "../storage/atoms";
 
 const Player = () => {
 
@@ -18,6 +19,7 @@ const Player = () => {
     const [position, setPosition] = useAtom(positionAtom);
     const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
     const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
+    const [isAuthenticated] = useAtom(isAuthenticatedAtom)
     const [loop, setLoop] = useAtom(loopAtom);
 
     // Callback to handle playback status updates from the playbackInstance
@@ -51,36 +53,59 @@ const Player = () => {
         const track = tracks[index];
 
         // Creates a new playbackInstance for the current track and begins playing.
-        const newPlaybackInstance = async () => {
+        const beginPlayback = async () => {
             // Create a source object
             const source = {
                 uri: track.url
             };
 
-            // Create a new playbackInstance and pass in our onPlaybackStatusUpdate method to listen to status updates.
-            const { sound, status } = await Audio.Sound.createAsync(source, {}, onPlaybackStatusUpdate);
-
-            // Set the playbackInstance in state.
-            setPlaybackInstance(sound);
-
-            // Start playing.
-            sound.playAsync();
-        }
-
-        // If we have a playbackInstance, kill it because the index just changed.
-        if(playbackInstance instanceof Object) {
-            playbackInstance.unloadAsync();
+            // If we have a playbackInstance, kill it because the index just changed.
+            if(playbackInstance instanceof Object) {
+                console.log('stopping...')
+                await playbackInstance.stopAsync();
+                await playbackInstance.unloadAsync();
+                await playbackInstance.loadAsync(source, { positionMillis: 0, shouldPlay: true });
+            } else {
+                await Audio.setAudioModeAsync({
+                    playsInSilentModeIOS: true
+                });
+    
+                // Create a new playbackInstance and pass in our onPlaybackStatusUpdate method to listen to status updates.
+                const { sound, status } = await Audio.Sound.createAsync(source, { positionMillis: 0, shouldPlay: true }, onPlaybackStatusUpdate);
+    
+                // Set the playbackInstance in state.
+                await setPlaybackInstance(sound);
+            }
         }
 
         // If the index is set...
         if(typeof index === 'number') {
             // Set the title of the current track in state.
             setTitle(track.title);
+            setPosition(0);
 
             // Create a new playbackInstance with the current track source.
-            newPlaybackInstance();
+            beginPlayback();
         }
     }, [index]);
+
+    // React to the playbackInstance being loaded.
+    useEffect(() => {
+        if(playbackInstance instanceof Object) {
+            playbackInstance.playAsync();
+        }
+    }, [playbackInstance]);
+
+    // React to user logout.
+    useEffect(() => {
+        if(!isAuthenticated) {
+            playbackInstance.stopAsync();
+            playbackInstance.unloadAsync();
+            setPlaybackInstance(null);
+            setIsPlaying(false);
+            setIndex(null);
+        }
+    }, [isAuthenticated]);
 
     // React to play/pause button press.
     const togglePlay = () => {
