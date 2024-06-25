@@ -2,7 +2,7 @@
   "expo": {
     "name": "tmc",
     "slug": "tmc",
-    "version": "7.0.1",
+    "version": "7.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -32,7 +32,8 @@
       "package": "com.themusicclass.ios",
       "permissions": [
         "android.permission.USE_BIOMETRIC",
-        "android.permission.USE_FINGERPRINT"
+        "android.permission.USE_FINGERPRINT",
+        "WAKE_LOCK"
       ]
     },
     "web": {

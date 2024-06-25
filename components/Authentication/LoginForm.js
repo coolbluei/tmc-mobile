@@ -53,7 +53,7 @@ const LoginForm = () => {
 
         if(response.type === 'error') {
             setMessage((
-                <Text>{response.error.data.message}</Text>
+                <Text style={Styles.highlight}>{response.error.data.message}</Text>
             ));    
         } else {
             if(response.status === 200) {
@@ -100,7 +100,7 @@ const LoginForm = () => {
     return (
         <SafeAreaView style={Styles.appWrapper}>
             {message}
-            <Text>Login</Text>
+            <Text style={Styles.title}>Login</Text>
             <TextInput value={usernameValue} onChangeText={setUsernameValue} style={Styles.input} placeholder="Username" />
             <TextInput value={passwordValue} onChangeText={setPasswordValue} secureTextEntry={true} style={Styles.input} placeholder="Password" />
             <Button onPress={login} title="Login" />

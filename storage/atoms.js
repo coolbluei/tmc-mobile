@@ -15,5 +15,19 @@ const userDataAtom = atom();
 const collectionDataAtom = atom();
 const classDateDataAtom = atom();
 const needsRefreshAtom = atom(true);
+const isAuthenticatedAtom = atom(false);
 
-export { apiAtom, credentialsAtom, accessTokenAtom, refreshTokenAtom, preferencesAtom, pageIdAtom, needsRefreshAtom, userDataAtom, collectionDataAtom, songDataAtom, classDateDataAtom };
+export { 
+    apiAtom, 
+    credentialsAtom, 
+    accessTokenAtom, 
+    refreshTokenAtom, 
+    preferencesAtom, 
+    pageIdAtom, 
+    needsRefreshAtom, 
+    userDataAtom, 
+    isAuthenticatedAtom, 
+    collectionDataAtom, 
+    songDataAtom, 
+    classDateDataAtom 
+};
