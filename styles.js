@@ -133,9 +133,8 @@ const Styles = StyleSheet.create({
     playerTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        whiteSpace: 'wrap',
-        width: '100%',
-        textAlign: 'center'
+        minWidth: '100%',
+        textAlign: 'center',
     },
     playerControls: {
         display: 'flex',

@@ -1,8 +1,8 @@
 import { Audio } from "expo-av";
 import { useAtom } from "jotai";
-import { tracksAtom, titleAtom, indexAtom, positionAtom, durationAtom, isLoadingAtom, isPlayingAtom, playbackInstanceAtom, loopAtom } from '../storage/audioAtoms';
+import { tracksAtom, titleAtom, indexAtom, positionAtom, durationAtom, isPlayingAtom, playbackInstanceAtom, loopAtom, isReadyAtom } from '../storage/audioAtoms';
 import { useEffect, useState } from "react";
-import { View, Text, TouchableHighlight } from "react-native";
+import { View, Text, TouchableHighlight, ActivityIndicator } from "react-native";
 import Slider from "@react-native-community/slider";
 import Styles from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -18,9 +18,10 @@ const Player = () => {
     const [duration, setDuration] = useAtom(durationAtom);
     const [position, setPosition] = useAtom(positionAtom);
     const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
-    const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
     const [isAuthenticated] = useAtom(isAuthenticatedAtom)
     const [loop, setLoop] = useAtom(loopAtom);
+    const [isReady, setIsReady] = useAtom(isReadyAtom);
+    const [lastIndex, setLastIndex] = useState(0);
 
     // Callback to handle playback status updates from the playbackInstance
     const onPlaybackStatusUpdate = (status) => {
@@ -28,8 +29,10 @@ const Player = () => {
         if(status.isLoaded) {
             setPosition(status.positionMillis);
             setIsPlaying(status.isPlaying);
-            setIsLoading(status.isBuffering);
             setDuration(status.durationMillis);
+            setIsReady(!status.isBuffering);
+        } else {
+            setIsReady(false);
         }
 
         // When a track finishes playing...
@@ -49,43 +52,47 @@ const Player = () => {
 
     // React to the index being updated
     useEffect(() => {
-        // Get the track object from the array of tracks for the current playlist.
-        const track = tracks[index];
+        if(isReady) {
+            // Get the track object from the array of tracks for the current playlist.
+            const track = tracks[index];
 
-        // Creates a new playbackInstance for the current track and begins playing.
-        const beginPlayback = async () => {
-            // Create a source object
-            const source = {
-                uri: track.url
-            };
+            // Creates a new playbackInstance for the current track and begins playing.
+            const beginPlayback = async () => {
+                // Create a source object
+                const source = {
+                    uri: track.url
+                };
 
-            // If we have a playbackInstance, kill it because the index just changed.
-            if(playbackInstance instanceof Object) {
-                console.log('stopping...')
-                await playbackInstance.stopAsync();
-                await playbackInstance.unloadAsync();
-                await playbackInstance.loadAsync(source, { positionMillis: 0, shouldPlay: true });
-            } else {
-                await Audio.setAudioModeAsync({
-                    playsInSilentModeIOS: true
-                });
-    
-                // Create a new playbackInstance and pass in our onPlaybackStatusUpdate method to listen to status updates.
-                const { sound, status } = await Audio.Sound.createAsync(source, { positionMillis: 0, shouldPlay: true }, onPlaybackStatusUpdate);
-    
-                // Set the playbackInstance in state.
-                await setPlaybackInstance(sound);
+                // If we have a playbackInstance, kill it because the index just changed.
+                if(playbackInstance instanceof Object) {
+                    await playbackInstance.unloadAsync();
+                    await playbackInstance.loadAsync(source, { positionMillis: 0, shouldPlay: true });
+                } else {
+                    await Audio.setAudioModeAsync({
+                        playsInSilentModeIOS: true
+                    });
+        
+                    // Create a new playbackInstance and pass in our onPlaybackStatusUpdate method to listen to status updates.
+                    const { sound, status } = await Audio.Sound.createAsync(source, { positionMillis: 0, shouldPlay: true }, onPlaybackStatusUpdate);
+        
+                    // Set the playbackInstance in state.
+                    await setPlaybackInstance(sound);
+                }
             }
-        }
 
-        // If the index is set...
-        if(typeof index === 'number') {
-            // Set the title of the current track in state.
-            setTitle(track.title);
-            setPosition(0);
+            // If the index is set...
+            if(typeof index === 'number') {
+                // Set the title of the current track in state.
+                setTitle(track.title);
+                setPosition(0);
 
-            // Create a new playbackInstance with the current track source.
-            beginPlayback();
+                // Create a new playbackInstance with the current track source.
+                beginPlayback();
+
+                setLastIndex(index);
+            }
+        } else {
+            setIndex(lastIndex);
         }
     }, [index]);
 
@@ -170,9 +177,15 @@ const Player = () => {
     let content = null;
 
     if(isPlaying || typeof index === 'number') {
+        let displayTitle = <ActivityIndicator size="small" color="#000000" />
+
+        if(isReady) {
+            displayTitle = <Text style={Styles.playerTitle}>{title}</Text>;
+        }
+        
         content = (
             <View style={Styles.player}>
-                <Text style={Styles.playerTitle}>{title}</Text>
+                <View style={Styles.container}>{displayTitle}</View>
                 <Slider style={{ width: '100%' }} value={position / duration} onSlidingComplete={seek} />
                 <View style={Styles.container}>
                     <View style={Styles.playerControls}>
