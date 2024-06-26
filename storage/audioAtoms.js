@@ -9,5 +9,6 @@ const isLoadingAtom = atom(false);
 const titleAtom = atom();
 const playbackInstanceAtom = atom();
 const loopAtom = atom(false);
+const isReadyAtom = atom(true);
 
-export { tracksAtom, indexAtom, positionAtom, durationAtom, isLoadingAtom, isPlayingAtom, titleAtom, playbackInstanceAtom, loopAtom };
+export { tracksAtom, indexAtom, positionAtom, durationAtom, isLoadingAtom, isPlayingAtom, titleAtom, playbackInstanceAtom, loopAtom, isReadyAtom };
