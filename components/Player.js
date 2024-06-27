@@ -21,7 +21,25 @@ const Player = () => {
     const [isAuthenticated] = useAtom(isAuthenticatedAtom)
     const [loop, setLoop] = useAtom(loopAtom);
     const [isReady, setIsReady] = useAtom(isReadyAtom);
-    const [lastIndex, setLastIndex] = useState(0);
+    const [advanceIndex, setAdvanceIndex] = useState(false);
+
+    // React to advanceIndex flag being updated.
+    useEffect(() => {
+        // If advanceIndex is true...
+        if(advanceIndex) {
+            // If this is not the last track in the playlist...
+            if(index + 1 < tracks.length) {
+                // Go to the next track.
+                setIndex(index + 1);
+            } else if(loop) {
+                // Otherwise, if we're looping...go to the first track.
+                setIndex(0);
+            }
+
+            // Set the advanceIndex flag back to false.
+            setAdvanceIndex(false);
+        }
+    }, [advanceIndex]);
 
     // Callback to handle playback status updates from the playbackInstance
     const onPlaybackStatusUpdate = (status) => {
@@ -37,16 +55,8 @@ const Player = () => {
 
         // When a track finishes playing...
         if(status.didJustFinish) {
-            // If this is the last track in the playlist...
-            if(index + 1 >= tracks.length) {
-                // Set the index back to zero if we're looping. Otherwise, do nothing.
-                if(loop) {
-                    setIndex(0);
-                }
-            } else {
-                // Not the last track, so set the index to the next track.
-                setIndex(index + 1);
-            }
+            // Set the advanceIndex flag to true so that the useEffect will fire.
+            setAdvanceIndex(true);
         }
     }
 
@@ -82,17 +92,15 @@ const Player = () => {
 
             // If the index is set...
             if(typeof index === 'number') {
+                console.log(index);
+                console.log(tracks.length);
                 // Set the title of the current track in state.
                 setTitle(track.title);
                 setPosition(0);
 
                 // Create a new playbackInstance with the current track source.
                 beginPlayback();
-
-                setLastIndex(index);
             }
-        } else {
-            setIndex(lastIndex);
         }
     }, [index]);
 
@@ -144,14 +152,8 @@ const Player = () => {
 
     // React to next button press.
     const next = () => {
-        // If this is not the last track in the playlist...
-        if(index + 1 <= tracks.length) {
-            // Go to the next track.
-            setIndex(index + 1);
-        } else if(loop) {
-            // Otherwise, if we're looping...go to the first track.
-            setIndex(0);
-        }
+        // Set the advanceIndex flat to true so the useEffect will fire.
+        setAdvanceIndex(true);
     };
 
     // React to seek slider changes.
@@ -182,6 +184,12 @@ const Player = () => {
         if(isReady) {
             displayTitle = <Text style={Styles.playerTitle}>{title}</Text>;
         }
+
+        let loopStyle = Styles.inactive;
+
+        if(loop) {
+            loopStyle = {};
+        }
         
         content = (
             <View style={Styles.player}>
@@ -192,7 +200,7 @@ const Player = () => {
                         <TouchableHighlight onPress={rewindOrPrev}><FontAwesomeIcon icon={faBackward} size={24} /></TouchableHighlight>
                         <TouchableHighlight onPress={togglePlay}>{playPauseButton}</TouchableHighlight>
                         <TouchableHighlight onPress={next}><FontAwesomeIcon icon={faForward} size={24} /></TouchableHighlight>
-                        <TouchableHighlight onPress={toggleLoop}><FontAwesomeIcon icon={faRotateLeft} size={24} /></TouchableHighlight>
+                        <TouchableHighlight onPress={toggleLoop}><FontAwesomeIcon icon={faRotateLeft} size={24} style={loopStyle} /></TouchableHighlight>
                     </View>
                 </View>
             </View>
