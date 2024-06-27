@@ -11,7 +11,7 @@ import { isAuthenticatedAtom } from "../storage/atoms";
 
 const Player = () => {
 
-    const [tracks, setTracks] = useAtom(tracksAtom);
+    const [tracks] = useAtom(tracksAtom);
     const [title, setTitle] = useAtom(titleAtom);
     const [playbackInstance, setPlaybackInstance] = useAtom(playbackInstanceAtom);
     const [index, setIndex] = useAtom(indexAtom);
@@ -22,6 +22,7 @@ const Player = () => {
     const [loop, setLoop] = useAtom(loopAtom);
     const [isReady, setIsReady] = useAtom(isReadyAtom);
     const [advanceIndex, setAdvanceIndex] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     // React to advanceIndex flag being updated.
     useEffect(() => {
@@ -92,8 +93,6 @@ const Player = () => {
 
             // If the index is set...
             if(typeof index === 'number') {
-                console.log(index);
-                console.log(tracks.length);
                 // Set the title of the current track in state.
                 setTitle(track.title);
                 setPosition(0);
@@ -109,18 +108,10 @@ const Player = () => {
         if(playbackInstance instanceof Object) {
             playbackInstance.playAsync();
         }
-    }, [playbackInstance]);
 
-    // React to user logout.
-    useEffect(() => {
-        if(!isAuthenticated) {
-            playbackInstance.stopAsync();
-            playbackInstance.unloadAsync();
-            setPlaybackInstance(null);
-            setIsPlaying(false);
-            setIndex(null);
-        }
-    }, [isAuthenticated]);
+        // This is the cleanup function for this component. If the Player unmounts, stop the sound.
+        return playbackInstance ? () => { playbackInstance.unloadAsync(); setPlaybackInstance(null); setIsPlaying(false); setIndex(null) } : undefined;
+    }, [playbackInstance]);
 
     // React to play/pause button press.
     const togglePlay = () => {
