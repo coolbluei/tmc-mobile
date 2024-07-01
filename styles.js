@@ -47,7 +47,8 @@ const Styles = StyleSheet.create({
         width: '100%',
         minWidth: '100%',
         flexBasis: 100,
-        overflow: 'scroll'
+        overflow: 'scroll',
+        display: 'flex'
     },
     scroll: {
         width: '100%',
@@ -55,28 +56,31 @@ const Styles = StyleSheet.create({
     },
     input: {
         height: 40,
-        marginTop: 12,
-        marginBottom: 12,
+        marginTop: margin,
+        marginBottom: margin,
         borderWidth: 1,
-        padding: 10,
+        padding: margin,
         width: 200,
+        paddingVertical: 0,
+        paddingHorizontal: margin,
+        borderRadius: borderRadius
     },
     navbar: {
-        flex: 1,
-        flexBasis: 1,
-        flexShrink: 1,
-        flexGrow: 0,
+        display: 'flex',
         padding: padding,
         borderTopColor: greyDark,
         borderTopWidth: 1,
         width: '100%',
     },
     navbarItems: {
-        flex: 1,
+        display: 'flex',
         flexDirection: 'row',
         gap: 60,
         width: '100%',
         justifyContent: 'center'
+    },
+    content: {
+        flexGrow: 10
     },
     navbarItem: {
         color: greyDark
@@ -128,7 +132,8 @@ const Styles = StyleSheet.create({
         width: '100%',
         padding: padding,
         borderTopWidth: 1,
-        borderTopColor: greyDark
+        borderTopColor: greyDark,
+        flexShrink: 10
     },
     playerTitle: {
         fontSize: 18,
