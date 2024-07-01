@@ -26,8 +26,6 @@ const Home = () => {
             // if(message instanceof String && message !== "") {
                 setCenterMessage(<View style={Styles.highlight}><Text>{message}</Text></View>);
             // }
-
-            console.log(userData);
         }
     }, [userData]);
 
@@ -36,9 +34,9 @@ const Home = () => {
             {centerMessage}
             <Text>{message}</Text>
             <WebView 
-                ref={webViewRef} 
-                originWhitelist={['*']} 
-                source={{ uri: uri }} 
+                ref={webViewRef}
+                originWhitelist={['*']}
+                source={{ uri: uri }}
                 containerStyle={{width: '100%'}}
                 javascriptEnabled={false}
                 onShouldStartLoadWithRequest={(request) => {

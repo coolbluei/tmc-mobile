@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import { accessTokenAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const User = () => {
 
@@ -14,6 +15,7 @@ const User = () => {
         setAccessToken(null);
         setRefreshToken(null);
         setUserData(null);
+        AsyncStorage.clear();
     };
 
     const user = new Entity(userData);
