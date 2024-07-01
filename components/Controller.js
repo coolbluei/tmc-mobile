@@ -2,13 +2,13 @@ import { apiAtom, credentialsAtom, isAuthenticatedAtom, pageIdAtom, userDataAtom
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
-import React from "react";
+import React, { useEffect } from "react";
 import User from "../screens/User";
 import Collections from "../screens/Collections";
 import ClassDates from "../screens/ClassDates";
 import Navbar from "./Navbar";
 import Styles from "../styles";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import Entity from "../drupal/Entity";
 import Songs from "../screens/Songs";
 import Player from "./Player";
@@ -23,15 +23,6 @@ const Controller = (props) => {
     const [songData, setSongData] = useAtom(songDataAtom)
     const [credentials] = useAtom(credentialsAtom);
     const [isAuthenticated] = useAtom(isAuthenticatedAtom);
-
-    let detailId = null;
-    let destination = pageId;
-
-    if(pageId && pageId.includes(':')) {
-        const routeParts = pageId.split(':');
-        detailId = routeParts[1];
-        destination = routeParts[0];
-    }
 
     const getUser = () => {
         const currentTime = new Date().getTime();
@@ -53,6 +44,8 @@ const Controller = (props) => {
                     data: response.data.data[0],
                     included: response.data?.included
                 };
+
+                console.log(data);
                 setUserData(data);
             }
         })
@@ -110,25 +103,65 @@ const Controller = (props) => {
         });
     }
 
+    let detailId = null;
+    let destination = pageId;
+
+    if(pageId && pageId.includes(':')) {
+        const routeParts = pageId.split(':');
+        detailId = routeParts[1];
+        destination = routeParts[0];
+    }
+
     const screens = {
-        "Home": <Home fetch={getUser} />,
-        "Collections": <Collections fetch={getCollections} />,
-        "User": <User fetch={getUser} />,
-        "Songs": <Songs fetch={getSongs} collectionId={detailId} />
+        "Home": {
+            component: <Home />,
+            get: getUser
+        },
+        "Collections": {
+            component: <Collections />,
+            get: getCollections
+        },
+        "User": {
+            component: <User />,
+            get: getUser
+        },
+        "Songs": {
+            component: <Songs />,
+            get: getSongs
+        }
     };
+
+    useEffect(() => {
+        if(api) {
+            if(detailId) {
+                screens[destination].get(detailId);
+            } else {
+                screens[destination].get();
+            }
+        }
+
+    }, [pageId, api]);
 
     let content = <LoginForm />;
 
     if(isAuthenticated) {
         content = (
-            <>
-                <View style={Styles.container}>
-                    {screens[destination]}
-                    <Player />
-                </View>
-                <Navbar />
-            </>
+            <View style={Styles.appWrapper}>
+                <ActivityIndicator size="large" color="#000000" />
+            </View>
         );
+
+        if(userData instanceof Object) {
+            content = (
+                <>
+                    <View style={Styles.container}>
+                        {screens[destination].component}
+                        <Player />
+                    </View>
+                    <Navbar />
+                </>
+            );
+        }
     }
 
     return content;

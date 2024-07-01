@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { Button, SafeAreaView, Switch, Text, TextInput } from 'react-native';
+import { Button, Image, SafeAreaView, Switch, Text, TextInput } from 'react-native';
 import { apiAtom, credentialsAtom, accessTokenAtom, preferencesAtom, refreshTokenAtom, pageIdAtom } from '../../storage/atoms';
 import Styles from '../../styles';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -99,6 +99,7 @@ const LoginForm = () => {
 
     return (
         <SafeAreaView style={Styles.appWrapper}>
+            <Image style={{height: 140, width: 140, marginBottom: 10}} source={require("../../assets/icon.png")} />
             {message}
             <Text style={Styles.title}>Login</Text>
             <TextInput value={usernameValue} onChangeText={setUsernameValue} style={Styles.input} placeholder="Username" />

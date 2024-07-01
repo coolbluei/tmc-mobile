@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
 
-const Home = (props) => {
+const Home = () => {
 
     const uri = 'https://themusicclass.com/ios-content';
 
@@ -17,21 +17,25 @@ const Home = (props) => {
 
     const [centerMessage, setCenterMessage] = useState();
 
-    useEffect(() => {
-        props.fetch();
-    }, []);
+    let message = null;
 
     useEffect(() => {
         if(userData instanceof Object && userData.hasOwnProperty('data')) {
             const user = new Entity(userData);
 
-            setCenterMessage(<View style={Styles.highlight}><Text>{user.get('center_message')}</Text></View>);
+            message = user.get('center_message');
+            // if(message instanceof String && message !== "") {
+                setCenterMessage(<View style={Styles.highlight}><Text>{message}</Text></View>);
+            // }
+
+            console.log(userData);
         }
     }, [userData]);
 
     return (
-        <SafeAreaView style={Styles.container}>
+        <View style={Styles.container}>
             {centerMessage}
+            <Text>{message}</Text>
             <WebView 
                 ref={webViewRef} 
                 originWhitelist={['*']} 
@@ -47,7 +51,7 @@ const Home = (props) => {
                     }
                 }}
             />
-        </SafeAreaView>
+        </View>
     );
 };
 

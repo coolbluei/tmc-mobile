@@ -7,15 +7,11 @@ import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Collection from "../components/Collection";
 
-const Collections = (props) => {
+const Collections = () => {
 
     const [collectionData] = useAtom(collectionDataAtom);
 
     const [items, setItems] = useState();
-
-    useEffect(() => {
-        props.fetch();
-    }, []);
 
     useEffect(() => {
         if(collectionData instanceof Object && collectionData.hasOwnProperty('data')) {
@@ -54,7 +50,7 @@ const Collections = (props) => {
     }
 
     return (
-        <View style={Styles.container}>
+        <View style={[Styles.container, Styles.content]}>
             <Text style={Styles.pageTitle}>My Music</Text>
             <ScrollView contentContainerStyle={Styles.scroll}>
                 {collectionDataContent}

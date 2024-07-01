@@ -7,16 +7,12 @@ import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Song from "../components/Song";
 
-const Songs = (props) => {
+const Songs = () => {
 
     const [songData] = useAtom(songDataAtom);
     const [title, setTitle] = useState();
 
     const [items, setItems] = useState();
-
-    useEffect(() => {
-        props.fetch(props.collectionId);
-    }, []);
 
     useEffect(() => {
         if(songData instanceof Object && songData.hasOwnProperty('data')) {
@@ -65,7 +61,7 @@ const Songs = (props) => {
     }
 
     return (
-        <View style={Styles.container}>
+        <View style={[Styles.container, Styles.content]}>
             <Text style={Styles.pageTitle}>{title}</Text>
             <ScrollView contentContainerStyle={Styles.scroll}>
                 {songDataContent}
