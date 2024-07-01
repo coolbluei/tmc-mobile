@@ -3,8 +3,6 @@ import { SafeAreaView } from 'react-native';
 import { Suspense } from 'react';
 import { Provider, createStore } from 'jotai';
 import AuthProvider from './components/Authentication/AuthProvider';
-// import { library } from '@fortawesome/fontawesome-svg-core';
-// import { fas } from '@fortawesome/free-solid-svg-icons';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import Styles from './styles';

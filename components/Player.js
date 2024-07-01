@@ -22,7 +22,6 @@ const Player = () => {
     const [loop, setLoop] = useAtom(loopAtom);
     const [isReady, setIsReady] = useAtom(isReadyAtom);
     const [advanceIndex, setAdvanceIndex] = useState(false);
-    const [isInitialized, setIsInitialized] = useState(false);
 
     // React to advanceIndex flag being updated.
     useEffect(() => {

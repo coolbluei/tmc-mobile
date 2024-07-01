@@ -1,11 +1,10 @@
-import { apiAtom, credentialsAtom, isAuthenticatedAtom, pageIdAtom, userDataAtom, collectionDataAtom, classDateDataAtom, songDataAtom } from "../storage/atoms";
+import { apiAtom, credentialsAtom, isAuthenticatedAtom, pageIdAtom, userDataAtom, collectionDataAtom, songDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
 import React, { useEffect } from "react";
 import User from "../screens/User";
 import Collections from "../screens/Collections";
-import ClassDates from "../screens/ClassDates";
 import Navbar from "./Navbar";
 import Styles from "../styles";
 import { ActivityIndicator, View } from "react-native";
@@ -19,7 +18,6 @@ const Controller = (props) => {
     const [pageId] = useAtom(pageIdAtom);
     const [userData, setUserData] = useAtom(userDataAtom);
     const [collectionData, setCollectionData] = useAtom(collectionDataAtom);
-    const [classDateData, setClassDateData] = useAtom(classDateDataAtom);
     const [songData, setSongData] = useAtom(songDataAtom)
     const [credentials] = useAtom(credentialsAtom);
     const [isAuthenticated] = useAtom(isAuthenticatedAtom);
@@ -78,10 +76,6 @@ const Controller = (props) => {
         .catch((error) => {
             console.log('Controller.getCollections:', error);
         });
-    }
-
-    const getClassDates = () => {
-        return;
     }
 
     const getSongs = (collectionId) => {

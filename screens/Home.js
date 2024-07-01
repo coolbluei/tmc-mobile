@@ -3,7 +3,6 @@ import { WebView } from "react-native-webview";
 import { useEffect, useRef, useState } from "react";
 import { userDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
 
