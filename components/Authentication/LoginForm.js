@@ -77,14 +77,12 @@ const LoginForm = () => {
         });
 
         if(result.success) {
-            console.log('success');
             setUsernameValue(credentials.username);
             setPasswordValue(credentials.password);
             login(credentials.username, credentials.password);
             return true;
         }
 
-        console.log('fail', result);
         return false;
     }
 

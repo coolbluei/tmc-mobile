@@ -1,4 +1,4 @@
-import { apiAtom, credentialsAtom, isAuthenticatedAtom, pageIdAtom, userDataAtom, collectionDataAtom, songDataAtom } from "../storage/atoms";
+import { apiAtom, credentialsAtom, isAuthenticatedAtom, pageIdAtom, userDataAtom, collectionDataAtom, songDataAtom, accessTokenAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
@@ -21,6 +21,7 @@ const Controller = (props) => {
     const [songData, setSongData] = useAtom(songDataAtom)
     const [credentials] = useAtom(credentialsAtom);
     const [isAuthenticated] = useAtom(isAuthenticatedAtom);
+    const [accessToken] = useAtom(accessTokenAtom);
 
     const getUser = () => {
         const currentTime = new Date().getTime();
@@ -125,7 +126,7 @@ const Controller = (props) => {
     };
 
     useEffect(() => {
-        if(api) {
+        if(api && isAuthenticated && credentials.hasOwnProperty('username')) {
             if(detailId) {
                 screens[destination].get(detailId);
             } else {
@@ -133,7 +134,7 @@ const Controller = (props) => {
             }
         }
 
-    }, [pageId, api]);
+    }, [pageId, api, isAuthenticated, credentials]);
 
     let content = <LoginForm />;
 
@@ -143,8 +144,6 @@ const Controller = (props) => {
                 <ActivityIndicator size="large" color="#000000" />
             </View>
         );
-
-        console.log(typeof userData);
 
         if(userData instanceof Object) {
             content = (
