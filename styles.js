@@ -63,6 +63,8 @@ const Styles = StyleSheet.create({
         width: 200,
         paddingVertical: 0,
         paddingHorizontal: margin,
+        paddingRight: margin,
+        paddingLeft: margin,
         borderRadius: borderRadius
     },
     navbar: {

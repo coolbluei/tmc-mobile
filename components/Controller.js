@@ -43,7 +43,6 @@ const Controller = (props) => {
                     included: response.data?.included
                 };
 
-                console.log(data);
                 setUserData(data);
             }
         })
@@ -144,6 +143,8 @@ const Controller = (props) => {
                 <ActivityIndicator size="large" color="#000000" />
             </View>
         );
+
+        console.log(typeof userData);
 
         if(userData instanceof Object) {
             content = (
