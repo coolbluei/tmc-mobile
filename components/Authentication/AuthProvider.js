@@ -6,7 +6,7 @@ import Controller from "../Controller";
 const AuthProvider = () => {
 
     const [api] = useAtom(apiAtom);
-    const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
+    const [accessToken] = useAtom(accessTokenAtom);
     const [needsRefresh, setNeedsRefresh] = useAtom(needsRefreshAtom);
     const [isAuthenticated, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
     const [isInitialized, setIsInitialized] = useState(false);

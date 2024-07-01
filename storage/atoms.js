@@ -13,21 +13,19 @@ const preferencesAtom = atomWithStorage('preferences', { useBiometrics: false },
 const songDataAtom = atom();
 const userDataAtom = atom();
 const collectionDataAtom = atom();
-const classDateDataAtom = atom();
 const needsRefreshAtom = atom(true);
 const isAuthenticatedAtom = atom(false);
 
 export { 
-    apiAtom, 
-    credentialsAtom, 
-    accessTokenAtom, 
-    refreshTokenAtom, 
-    preferencesAtom, 
-    pageIdAtom, 
-    needsRefreshAtom, 
-    userDataAtom, 
-    isAuthenticatedAtom, 
-    collectionDataAtom, 
-    songDataAtom, 
-    classDateDataAtom 
+    apiAtom,
+    credentialsAtom,
+    accessTokenAtom,
+    refreshTokenAtom,
+    preferencesAtom,
+    pageIdAtom,
+    needsRefreshAtom,
+    userDataAtom,
+    isAuthenticatedAtom,
+    collectionDataAtom,
+    songDataAtom
 };

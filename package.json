@@ -22,7 +22,6 @@
     "axios": "^1.6.8",
     "axios-auth-refresh": "^3.3.6",
     "expo": "~51.0.10",
-    "expo-audio-hooks": "^1.0.3",
     "expo-av": "^14.0.5",
     "expo-local-authentication": "~14.0.1",
     "expo-status-bar": "~1.12.1",
