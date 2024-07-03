@@ -42,7 +42,7 @@ const AuthProvider = () => {
     }, [needsRefresh, accessToken]);
 
     return (
-        <Controller isAuthenticated={isAuthenticated} />
+        <Controller />
     );
 };
 

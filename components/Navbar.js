@@ -1,22 +1,21 @@
 import { TouchableHighlight, View } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHome, faCog, faMusic, faUser } from "@fortawesome/free-solid-svg-icons";
-import { useAtom } from "jotai";
-import { pageIdAtom } from "../storage/atoms";
 import Styles from "../styles";
+import { useNavigation } from "@react-navigation/native";
 
 const Navbar = () => {
 
-    const [pageId, setPageId] = useAtom(pageIdAtom);
+    const navigation = useNavigation();
 
     return (
         <View style={Styles.navbar}>
             <View style={Styles.navbarItems}>
-                <TouchableHighlight onPress={() => setPageId('Home')}>
+                <TouchableHighlight onPress={() => navigation.navigate('Home')}>
                     <FontAwesomeIcon icon={faHome} size={24} style={Styles.navbarItem} />
                 </TouchableHighlight>
 
-                <TouchableHighlight onPress={() => setPageId('Collections')}>
+                <TouchableHighlight onPress={() => navigation.navigate('Collections')}>
                     <FontAwesomeIcon icon={faMusic} size={24} style={Styles.navbarItem} />
                 </TouchableHighlight>
 
@@ -24,7 +23,7 @@ const Navbar = () => {
                     <FontAwesomeIcon icon={faCog} size={24} style={Styles.navbarItem} />
                 </TouchableHighlight>
 
-                <TouchableHighlight onPress={() => setPageId('User')}>
+                <TouchableHighlight onPress={() => navigation.navigate('User')}>
                     <FontAwesomeIcon icon={faUser} size={24} style={Styles.navbarItem} />
                 </TouchableHighlight>
             </View>

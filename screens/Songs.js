@@ -1,18 +1,42 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { songDataAtom } from "../storage/atoms";
+import { apiAtom, songDataAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Song from "../components/Song";
 
-const Songs = () => {
+const Songs = (props) => {
 
-    const [songData] = useAtom(songDataAtom);
+    const [songData, setSongData] = useAtom(songDataAtom);
+    const [api] = useAtom(apiAtom);
     const [title, setTitle] = useState();
 
     const [items, setItems] = useState();
+
+    const getSongs = () => {
+        const currentTime = new Date().getTime();
+
+        api.getEntity('node', 'collection', props.route.params.collectionId)
+        .then((response) => {
+            if(response.status === 200) {
+                const data = {
+                    expiration: currentTime,
+                    data: response.data.data,
+                    included: response.data?.included
+                };
+                setSongData(data);
+            }
+        })
+        .catch((error) => {
+            console.log('Songs.getSongs:', error);
+        });
+    }
+
+    useEffect(() => {
+        getSongs();
+    }, [])
 
     useEffect(() => {
         if(songData instanceof Object && songData.hasOwnProperty('data')) {
@@ -61,12 +85,12 @@ const Songs = () => {
     }
 
     return (
-        <View style={[Styles.container, Styles.content]}>
+        <SafeAreaView style={[Styles.container, Styles.content]}>
             <Text style={Styles.pageTitle}>{title}</Text>
             <ScrollView contentContainerStyle={Styles.scroll}>
                 {songDataContent}
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 };
 

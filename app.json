@@ -2,7 +2,7 @@
   "expo": {
     "name": "tmc",
     "slug": "tmc",
-    "version": "7.0.2",
+    "version": "7.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
