@@ -1,11 +1,10 @@
 import { Platform, StyleSheet } from "react-native";
 
 let appPaddingTop = 0;
-let appPaddingBottom = 0;
+let appPaddingBottom = 25;
 
 if(Platform.OS === 'android') {
     appPaddingTop = 40;
-    appPaddingBottom = 25;
 }
 
 const borderRadius = 6;
@@ -24,6 +23,7 @@ const thumbnailSize = 80;
 
 const Styles = StyleSheet.create({
     appWrapper: {
+        flex: 1,
         paddingTop: appPaddingTop,
         paddingBottom: appPaddingBottom,
         flexBasis: 20,
@@ -31,10 +31,6 @@ const Styles = StyleSheet.create({
         flexShrink: 0,
         backgroundColor: white,
         justifyContent: 'center',
-        alignItems: 'center',
-        height: '100%',
-        minWidth: '100%',
-        flexBasis: 100
     },
     container: {
         flexBasis: 20,
@@ -48,7 +44,8 @@ const Styles = StyleSheet.create({
         minWidth: '100%',
         flexBasis: 100,
         overflow: 'scroll',
-        display: 'flex'
+        display: 'flex',
+        flex: 1
     },
     scroll: {
         width: '100%',
@@ -157,6 +154,9 @@ const Styles = StyleSheet.create({
     },
     inactive: {
         color: '#cdcdcd'
+    },
+    alignCenter: {
+        alignItems: 'center'
     }
 });
 

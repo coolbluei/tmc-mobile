@@ -7,7 +7,6 @@ import Slider from "@react-native-community/slider";
 import Styles from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBackward, faForward, faPause, faPlay, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
-import { isAuthenticatedAtom } from "../storage/atoms";
 
 const Player = () => {
 
@@ -18,7 +17,6 @@ const Player = () => {
     const [duration, setDuration] = useAtom(durationAtom);
     const [position, setPosition] = useAtom(positionAtom);
     const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
-    const [isAuthenticated] = useAtom(isAuthenticatedAtom)
     const [loop, setLoop] = useAtom(loopAtom);
     const [isReady, setIsReady] = useAtom(isReadyAtom);
     const [advanceIndex, setAdvanceIndex] = useState(false);
@@ -183,9 +181,9 @@ const Player = () => {
         
         content = (
             <View style={Styles.player}>
-                <View style={Styles.container}>{displayTitle}</View>
+                <View style={Styles.alignCenter}>{displayTitle}</View>
                 <Slider style={{ width: '100%' }} value={position / duration} onSlidingComplete={seek} />
-                <View style={Styles.container}>
+                <View style={Styles.alignCenter}>
                     <View style={Styles.playerControls}>
                         <TouchableHighlight onPress={rewindOrPrev}><FontAwesomeIcon icon={faBackward} size={24} /></TouchableHighlight>
                         <TouchableHighlight onPress={togglePlay}>{playPauseButton}</TouchableHighlight>

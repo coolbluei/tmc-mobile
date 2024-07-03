@@ -96,7 +96,7 @@ const LoginForm = () => {
     }
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={Styles.appWrapper}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={[Styles.appWrapper, Styles.alignCenter]}>
             <Image style={{height: 140, width: 140, marginBottom: 10}} source={require("../../assets/icon.png")} />
             {message}
             <Text style={Styles.title}>Login</Text>

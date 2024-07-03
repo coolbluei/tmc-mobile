@@ -1,7 +1,7 @@
-import { Linking, Platform, Text, View } from "react-native";
+import { Linking, Platform, SafeAreaView, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useEffect, useRef, useState } from "react";
-import { userDataAtom } from "../storage/atoms";
+import { apiAtom, credentialsAtom, userDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
@@ -12,11 +12,46 @@ const Home = () => {
 
     const webViewRef = useRef(null);
 
-    const [userData] = useAtom(userDataAtom);
+    const [userData, setUserData] = useAtom(userDataAtom);
+    const [api] = useAtom(apiAtom);
+    const [credentials] = useAtom(credentialsAtom);
 
     const [centerMessage, setCenterMessage] = useState();
 
     let message = null;
+
+    const getUser = () => {
+        const currentTime = new Date().getTime();
+
+        // if(userData && userData.expiration < currentTime) {
+        //     return userData.data;
+        // }
+
+        const params = {
+            'filter[email][path]': 'name',
+            'filter[email][value]': credentials.username
+        };
+
+        api.getEntities('user', 'user', params)
+        .then((response) => {
+            if(response.status === 200) {
+                const data = {
+                    expiration: currentTime,
+                    data: response.data.data[0],
+                    included: response.data?.included
+                };
+
+                setUserData(data);
+            }
+        })
+        .catch((error) => {
+            console.log('Home.getUser:', error);
+        });
+    }
+
+    useEffect(() => {
+        getUser();
+    }, []);
 
     useEffect(() => {
         if(userData instanceof Object && userData.hasOwnProperty('data')) {
@@ -30,7 +65,7 @@ const Home = () => {
     }, [userData]);
 
     return (
-        <View style={Styles.container}>
+        <SafeAreaView style={Styles.container}>
             {centerMessage}
             <Text>{message}</Text>
             <WebView 
@@ -48,7 +83,7 @@ const Home = () => {
                     }
                 }}
             />
-        </View>
+        </SafeAreaView>
     );
 };
 
