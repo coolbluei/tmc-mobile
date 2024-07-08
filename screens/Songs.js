@@ -55,7 +55,7 @@ const Songs = (props) => {
                     return {
                         title: song.get('title'),
                         artist: collection.get('title'),
-                        artwork: song.get('field_image').get('uri').url,
+                        artwork: song.get('field_image')?.get('uri')?.url,
                         url: song.get('field_full_song').get('uri').url
                     };
                 })

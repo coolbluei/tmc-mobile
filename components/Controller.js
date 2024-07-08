@@ -40,7 +40,7 @@ const Controller = () => {
         if(isInitialized) {
             content = (
                 <View style={Styles.appWrapper}>
-                    <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: false}}>
+                    <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: true}}>
                         <Stack.Screen name="Home" component={Home} />
                         <Stack.Screen name="Collections" component={Collections} />
                         <Stack.Screen name="Songs" component={Songs} />
