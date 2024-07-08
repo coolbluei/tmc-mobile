@@ -1,4 +1,4 @@
-import { Audio } from "expo-av";
+import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { useAtom } from "jotai";
 import { tracksAtom, titleAtom, indexAtom, positionAtom, durationAtom, isPlayingAtom, playbackInstanceAtom, loopAtom, isReadyAtom } from '../storage/audioAtoms';
 import { useEffect, useState } from "react";
@@ -77,7 +77,12 @@ const Player = () => {
                     await playbackInstance.loadAsync(source, { positionMillis: 0, shouldPlay: true });
                 } else {
                     await Audio.setAudioModeAsync({
-                        playsInSilentModeIOS: true
+                        staysActiveInBackground: true,
+                        playsInSilentModeIOS: true,
+                        interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+                        interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+                        shouldDuckAndroid: true,
+                        playThroughEarpieceAndroid: true
                     });
         
                     // Create a new playbackInstance and pass in our onPlaybackStatusUpdate method to listen to status updates.
