@@ -117,10 +117,12 @@ const Player = () => {
 
     // React to play/pause button press.
     const togglePlay = () => {
-        if(isPlaying) {
-            playbackInstance.pauseAsync();
-        } else {
-            playbackInstance.playAsync();
+        if(isReady) {
+            if(isPlaying) {
+                playbackInstance.pauseAsync();
+            } else {
+                playbackInstance.playAsync();
+            }
         }
     };
 
@@ -130,23 +132,27 @@ const Player = () => {
 
     // React to previous button press. 
     const rewindOrPrev = () => {
-        // If the position is more than 500 milliseconds...
-        if(position > 500) {
-            // Go back to the beginning of the track.
-            playbackInstance.setPositionAsync(0);
-        } else {
-            // Otherwise, if there is an earlier song in the playlist...
-            if(index > 0) {
-                // Go to the previous song.
-                setIndex(index - 1);
+        if(isReady) {
+            // If the position is more than 500 milliseconds...
+            if(position > 500) {
+                // Go back to the beginning of the track.
+                playbackInstance.setPositionAsync(0);
+            } else {
+                // Otherwise, if there is an earlier song in the playlist...
+                if(index > 0) {
+                    // Go to the previous song.
+                    setIndex(index - 1);
+                }
             }
         }
     };
 
     // React to next button press.
     const next = () => {
-        // Set the advanceIndex flat to true so the useEffect will fire.
-        setAdvanceIndex(true);
+        if(isReady) {
+            // Set the advanceIndex flat to true so the useEffect will fire.
+            setAdvanceIndex(true);
+        }
     };
 
     // React to seek slider changes.
