@@ -2,16 +2,18 @@ import { useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { apiAtom, collectionDataAtom, userDataAtom } from "../storage/atoms";
+import { apiAtom, collectionDataAtom, playlistAtom, userDataAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Collection from "../components/Collection";
+import Playlist from "../components/Playlist";
 
 const Collections = () => {
 
     const [userData] = useAtom(userDataAtom);
     const [collectionData, setCollectionData] = useAtom(collectionDataAtom);
     const [api] = useAtom(apiAtom);
+    const [playlists] = useAtom(playlistAtom);
 
     const [items, setItems] = useState();
 
@@ -62,6 +64,10 @@ const Collections = () => {
                         <Collection key={collection.get('id')} data={collection} />
                     );
                 });
+
+                if(playlists.favorites.songs.length > 0) {
+                    content.unshift(<Playlist key="favorites" title="Favorites" playlistId="favorites" />);
+                }
 
                 setItems(content);
             }

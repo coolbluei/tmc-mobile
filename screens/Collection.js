@@ -2,16 +2,18 @@ import { useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { apiAtom, songDataAtom } from "../storage/atoms";
+import { apiAtom, songDataAtom, playlistData, userDataAtom, playlistAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Song from "../components/Song";
 
-const Songs = (props) => {
+const Collection = (props) => {
 
     const [songData, setSongData] = useAtom(songDataAtom);
     const [api] = useAtom(apiAtom);
     const [title, setTitle] = useState();
+    const [userData] = useAtom(userDataAtom);
+    const [playlists] = useAtom(playlistAtom)
 
     const [items, setItems] = useState();
 
@@ -62,8 +64,16 @@ const Songs = (props) => {
 
                 const content = songs.map((element, i) => {
                     const song = new Include(element, collection.included);
+
+                    const user = new Entity(userData);
+                    let isFavorite = false;
+
+                    if(playlists.favorites.songs.find((e) => e === element.get('id'))) {
+                        isFavorite = true;
+                    }
+
                     return (
-                        <Song key={song.get('id')} data={song} trackIndex={i} tracks={trackItems} />
+                        <Song key={song.get('id')} data={song} trackIndex={i} isFavorite={isFavorite} tracks={trackItems} />
                     );
                 });
 
@@ -94,4 +104,4 @@ const Songs = (props) => {
     );
 };
 
-export default Songs;
+export default Collection;
