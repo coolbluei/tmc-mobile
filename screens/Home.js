@@ -1,10 +1,11 @@
 import { Linking, Platform, SafeAreaView, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useEffect, useRef, useState } from "react";
-import { apiAtom, credentialsAtom, userDataAtom } from "../storage/atoms";
+import { apiAtom, credentialsAtom, userDataAtom, playlistAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
+import Include from "../drupal/Include";
 
 const Home = () => {
 
@@ -15,6 +16,7 @@ const Home = () => {
     const [userData, setUserData] = useAtom(userDataAtom);
     const [api] = useAtom(apiAtom);
     const [credentials] = useAtom(credentialsAtom);
+    const [playlists, setPlaylists] = useAtom(playlistAtom);
 
     const [centerMessage, setCenterMessage] = useState();
 
@@ -58,16 +60,34 @@ const Home = () => {
             const user = new Entity(userData);
 
             message = user.get('center_message');
-            // if(message instanceof String && message !== "") {
+            if(message) {
                 setCenterMessage(<View style={Styles.highlight}><Text>{message}</Text></View>);
-            // }
+            }
+
+            let favorites = {
+                title: 'Favorites',
+                id: 'favorites',
+                songs: []
+            };
+
+            if(user.get('field_favorites') instanceof Array) {
+                favorites.songs = user.get('field_favorites').data.map((song) => song.get('id'));
+            } else if(user.get('field_favorites') instanceof Include) {
+                favorites.songs = [
+                    user.get('field_favorites').get('id')
+                ];
+            }
+
+            setPlaylists({
+                favorites: favorites,
+                userDefined: []
+            });
         }
     }, [userData]);
 
     return (
         <SafeAreaView style={Styles.container}>
             {centerMessage}
-            <Text>{message}</Text>
             <WebView 
                 ref={webViewRef}
                 originWhitelist={['*']}

@@ -9,10 +9,10 @@ const Collection = (props) => {
 
     return (
         <View style={Styles.padded}>
-            <TouchableHighlight style={Styles.listItem} onPress={() => navigation.navigate('Collection', { collectionId: props.data.get('id') })}>
+            <TouchableHighlight style={Styles.listItem} onPress={() => navigation.navigate('Playlist', { playlistId: props.playlistId })}>
                 <View style={Styles.listItemContent}>
-                    <Image style={Styles.listItemImage} src={props.data.get('field_image').get('uri').url} />
-                    <Text style={Styles.title}>{props.data.get('title')}</Text>
+                    <Image style={Styles.listItemImage} />
+                    <Text style={Styles.title}>{props.title}</Text>
                 </View>
             </TouchableHighlight>
         </View>

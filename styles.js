@@ -125,7 +125,10 @@ const Styles = StyleSheet.create({
         fontWeight: 'bold',
         whiteSpace: 'wrap',
         flexWrap: 'wrap',
-        flexShrink: 1
+        flexShrink: 1,
+    },
+    listTitle: {
+        flexGrow: 1
     },
     player: {
         width: '100%',

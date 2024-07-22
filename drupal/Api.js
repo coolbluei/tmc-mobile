@@ -64,6 +64,16 @@ export default class Api {
         return Promise.resolve();
     }
 
+    patchEntity = async (entityType, entityBundle, id, body) => {
+        let accessToken = await this.jotai.get(accessTokenAtom);
+
+        const options = this.getStandardHeaders(accessToken);
+
+        const response = await axios.patch(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() + `${entityType}/${entityBundle}/${id}`, body, options);
+
+        return Object.assign(response);
+    }
+
     getEntity = async (entityType, entityBundle, id, params = {}) => {
         
         let accessToken = await this.jotai.get(accessTokenAtom);

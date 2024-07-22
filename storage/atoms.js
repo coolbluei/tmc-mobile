@@ -10,6 +10,9 @@ const credentialsAtom = atomWithStorage('credentials', {}, storage);
 const accessTokenAtom = atomWithStorage('accessToken', null, storage);
 const refreshTokenAtom = atomWithStorage('refreshToken', null, storage);
 const preferencesAtom = atomWithStorage('preferences', { useBiometrics: false }, storage);
+const playlistAtom = atomWithStorage('playlists', { favorites: { id: 'favorites', title: 'Favorites', songs: [] }, userDefined: [] }, storage);
+const playlistSyncAtom = atomWithStorage('playlistsSync', false, storage);
+const lastPlaylistSyncAtom = atomWithStorage('lastPlaylistSync', 0, storage);
 const songDataAtom = atom();
 const userDataAtom = atom();
 const collectionDataAtom = atom();
@@ -27,5 +30,8 @@ export {
     userDataAtom,
     isAuthenticatedAtom,
     collectionDataAtom,
-    songDataAtom
+    songDataAtom,
+    playlistAtom,
+    playlistSyncAtom,
+    lastPlaylistSyncAtom
 };
