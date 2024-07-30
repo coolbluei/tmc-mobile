@@ -28,8 +28,9 @@ const Song = (props) => {
         if(isFavorite) {
             // Remove from favorites.
             const i = lists.favorites.songs.indexOf(props.data.get('id'));
-            if(i) {
-                lists.favoriates.songs.splice(i, 1);
+
+            if(i >= 0) {
+                lists.favorites.songs.splice(i, 1);
             }
         } else {
             // Add to favorites.

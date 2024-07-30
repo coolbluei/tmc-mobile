@@ -36,9 +36,11 @@ const Controller = () => {
 
     useEffect(() => {
         if(api && playlistSync && userData) {
+            console.log('reacting to playlist sync');
             const currentTime = new Date().getTime();
 
             if(currentTime > lastPlaylistSync + (30 * 1000)) {
+                console.log('starting write');
             
                 const user = new Entity(userData);
 
@@ -64,6 +66,7 @@ const Controller = () => {
                 api.patchEntity('user', 'user', user.get('id'), body)
                 .then((response) => {
                     if(response.status === 200) {
+                        console.log('write successful');
                         setPlaylistSync(false);
                         setLastPlaylistSync(currentTime);
                     }
@@ -88,7 +91,7 @@ const Controller = () => {
             content = (
                 <View style={Styles.appWrapper}>
                     <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: true}}>
-                        <Stack.Screen name="Home" component={Home} />
+                        <Stack.Screen name="Home" component={Home} headerShown={false} />
                         <Stack.Screen name="Collections" component={Collections} />
                         <Stack.Screen name="Collection" component={Collection} />
                         <Stack.Screen name="Playlist" component={Playlist} />

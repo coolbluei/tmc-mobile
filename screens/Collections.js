@@ -73,7 +73,7 @@ const Collections = () => {
             }
             
         }
-    }, [collectionData]);
+    }, [collectionData, playlists]);
 
     let collectionDataContent = null;
 

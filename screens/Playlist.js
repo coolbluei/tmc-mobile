@@ -44,7 +44,7 @@ const Playlist = (props) => {
 
     useEffect(() => {
         getSongs();
-    }, [])
+    }, [playlists])
 
     useEffect(() => {
         if(songData instanceof Object && songData.hasOwnProperty('data')) {
