@@ -64,7 +64,8 @@ const Playlist = (props) => {
                         title: song.get('title'),
                         artist: "Favorites",
                         artwork: song.get('field_image')?.get('uri')?.url,
-                        url: song.get('field_full_song').get('uri').url
+                        url: song.get('field_full_song').get('uri').url,
+                        id: song.get('id'),
                     };
                 });
 

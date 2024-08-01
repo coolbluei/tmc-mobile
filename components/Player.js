@@ -1,12 +1,14 @@
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { useAtom } from "jotai";
 import { tracksAtom, titleAtom, indexAtom, positionAtom, durationAtom, isPlayingAtom, playbackInstanceAtom, loopAtom, isReadyAtom } from '../storage/audioAtoms';
+import { downloadsAtom } from "../storage/atoms";
 import { useEffect, useState } from "react";
 import { View, Text, TouchableHighlight, ActivityIndicator } from "react-native";
 import Slider from "@react-native-community/slider";
 import Styles from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBackward, faForward, faPause, faPlay, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import * as FileSystem from 'expo-file-system';
 
 const Player = () => {
 
@@ -19,6 +21,9 @@ const Player = () => {
     const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
     const [loop, setLoop] = useAtom(loopAtom);
     const [isReady, setIsReady] = useAtom(isReadyAtom);
+
+    const [downloads] = useAtom(downloadsAtom);
+
     const [advanceIndex, setAdvanceIndex] = useState(false);
 
     // React to advanceIndex flag being updated.
@@ -66,10 +71,17 @@ const Player = () => {
 
             // Creates a new playbackInstance for the current track and begins playing.
             const beginPlayback = async () => {
+
                 // Create a source object
-                const source = {
+                let source = {
                     uri: track.url
                 };
+
+                if(downloads.includes(track.id + '.mp3')) {
+                    source = {
+                        uri: FileSystem.documentDirectory + 'songs/' + track.id + '.mp3'
+                    };
+                }
 
                 // If we have a playbackInstance, kill it because the index just changed.
                 if(playbackInstance instanceof Object) {

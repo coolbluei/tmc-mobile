@@ -1,4 +1,4 @@
-import { apiAtom, credentialsAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, userDataAtom } from "../storage/atoms";
+import { apiAtom, credentialsAtom, downloadsAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, updateDownloadsAtom, userDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
@@ -13,6 +13,7 @@ import Collection from "../screens/Collection";
 import Player from "./Player";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Entity from "../drupal/Entity";
+import * as FileSystem from 'expo-file-system';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,8 +26,19 @@ const Controller = () => {
     const [playlistSync, setPlaylistSync] = useAtom(playlistSyncAtom);
     const [lastPlaylistSync, setLastPlaylistSync] = useAtom(lastPlaylistSyncAtom);
     const [userData, setUserData] = useAtom(userDataAtom);
+    const [downloads, setDownloads] = useAtom(downloadsAtom);
+    const [updateDownloads, setUpdateDownloads] = useAtom(updateDownloadsAtom);
 
     const [isInitialized, setIsInitialized] = useState(false);
+
+    useEffect(() => {
+        if(updateDownloads) {
+            FileSystem.readDirectoryAsync(FileSystem.documentDirectory + 'songs/').then((data) => {
+                setDownloads(data);
+                setUpdateDownloads(false);
+            });
+        }
+    }, [updateDownloads]);
 
     useEffect(() => {
         if(api && isAuthenticated && credentials.hasOwnProperty('username')) {
