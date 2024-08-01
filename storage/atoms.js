@@ -18,6 +18,8 @@ const userDataAtom = atom();
 const collectionDataAtom = atom();
 const needsRefreshAtom = atom(true);
 const isAuthenticatedAtom = atom(false);
+const downloadsAtom = atom([]);
+const updateDownloadsAtom = atom(true);
 
 export { 
     apiAtom,
@@ -33,5 +35,7 @@ export {
     songDataAtom,
     playlistAtom,
     playlistSyncAtom,
-    lastPlaylistSyncAtom
+    lastPlaylistSyncAtom,
+    downloadsAtom,
+    updateDownloadsAtom
 };
