@@ -20,6 +20,8 @@ const needsRefreshAtom = atom(true);
 const isAuthenticatedAtom = atom(false);
 const downloadsAtom = atom([]);
 const updateDownloadsAtom = atom(true);
+const downloadQueueAtom = atom([]);
+const downloadsInProgressAtom = atom([]);
 
 export { 
     apiAtom,
@@ -37,5 +39,7 @@ export {
     playlistSyncAtom,
     lastPlaylistSyncAtom,
     downloadsAtom,
-    updateDownloadsAtom
+    updateDownloadsAtom,
+    downloadQueueAtom,
+    downloadsInProgressAtom
 };

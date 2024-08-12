@@ -23,7 +23,7 @@ const Collections = () => {
         const user = new Entity(userData);
 
         const params = {
-            'include': 'field_application_access,field_application_access.field_image',
+            'include': 'field_application_access,field_application_access.field_image,field_application_access.field_songs,field_application_access.field_songs.field_full_song',
             'fields[user--user]': 'id,field_application_access'
         };
 
