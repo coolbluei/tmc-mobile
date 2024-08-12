@@ -1,4 +1,4 @@
-import { apiAtom, credentialsAtom, downloadsAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, updateDownloadsAtom, userDataAtom } from "../storage/atoms";
+import { apiAtom, credentialsAtom, downloadsAtom, downloadQueueAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, updateDownloadsAtom, userDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
@@ -8,7 +8,7 @@ import Collections from "../screens/Collections";
 import Playlist from "../screens/Playlist";
 import Navbar from "./Navbar";
 import Styles from "../styles";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Modal, View } from "react-native";
 import Collection from "../screens/Collection";
 import Player from "./Player";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -28,8 +28,53 @@ const Controller = () => {
     const [userData, setUserData] = useAtom(userDataAtom);
     const [downloads, setDownloads] = useAtom(downloadsAtom);
     const [updateDownloads, setUpdateDownloads] = useAtom(updateDownloadsAtom);
+    const [downloadQueue, setDownloadQueue] = useAtom(downloadQueueAtom);
 
     const [isInitialized, setIsInitialized] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
+
+    const removeSongFromDownloadQueue = () => {
+        let queue = [...downloadQueue];
+        queue.shift();
+        setDownloadQueue(queue);
+    };
+
+    const downloadProgress = (progress) => {
+        if(progress.totalBytesWritten === progress.totalBytesExpectedToWrite) {
+            removeSongFromDownloadQueue();
+        }
+    };
+
+    const downloadNextSong = async () => {
+        try {
+            const song = downloadQueue[0];
+
+            const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'songs/');
+            
+            if(!dirInfo.exists) {
+                await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'songs/');
+            }
+
+            if(downloads.includes(song.get('id') + '.mp3') === false) {
+                await FileSystem.createDownloadResumable(song.get('field_full_song').get('uri').url, FileSystem.documentDirectory + 'songs/' + song.get('id') + '.mp3', {}, downloadProgress).downloadAsync();
+            } else {
+                removeSongFromDownloadQueue();
+            }
+        } catch (e) {
+            console.log('DownloadNextSong:', e);
+            setIsDownloading(false);
+        }
+    };
+
+    useEffect(() => {
+        if(downloadQueue.length === 0) {
+            setIsDownloading(false);
+            setUpdateDownloads(true);
+        } else {
+            setIsDownloading(true);
+            downloadNextSong();
+        }
+    }, [downloadQueue]);
 
     useEffect(() => {
         if(updateDownloads) {
@@ -102,6 +147,11 @@ const Controller = () => {
         if(isInitialized) {
             content = (
                 <View style={Styles.appWrapper}>
+                    <Modal animationType="fade" transparent={true} visible={isDownloading}>
+                        <View style={[Styles.container, Styles.modal]}>
+                            <ActivityIndicator size="large" color="#ffffff" />
+                        </View>
+                    </Modal>
                     <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: true}}>
                         <Stack.Screen name="Home" component={Home} headerShown={false} />
                         <Stack.Screen name="Collections" component={Collections} />

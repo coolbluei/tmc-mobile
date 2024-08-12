@@ -16,6 +16,7 @@ const greyLight = '#eeeeee';
 const greyMedium = '#aaaaaa';
 const greyDark = '#555555';
 const black = '#000000';
+const overlay = 'rgba(0, 0, 0, 0.8)';
 
 const secondaryLight = '#abcdef';
 const secondary = '#8abcde';
@@ -185,6 +186,11 @@ const Styles = StyleSheet.create({
     },
     isDownloading: {
         color: greyMedium
+    },
+    modal: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: overlay
     }
 });
 
