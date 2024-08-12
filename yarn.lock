@@ -15,6 +15,13 @@
     "@jridgewell/gen-mapping" "^0.3.5"
     "@jridgewell/trace-mapping" "^0.3.24"
 
+"@awesome.me/kit-9ca14bdc9a@^1.0.4":
+  version "1.0.4"
+  resolved "https://npm.fontawesome.com/@awesome.me/kit-9ca14bdc9a/-/1.0.4/kit-9ca14bdc9a-1.0.4.tgz#4a9bced16a1d7fb139f663c9ccfe414c54df5942"
+  integrity sha512-6NQ9l6UUwSCHU2QhwaqeeWM4g4eZMDDpyHDHBqVZBNZCs8mT+h+rSBXsB7s/6S1OPfjRzj0zBRr4y+Rt14Nd2Q==
+  dependencies:
+    "@fortawesome/fontawesome-common-types" "^6.6.0"
+
 "@babel/code-frame@7.10.4", "@babel/code-frame@~7.10.4":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.10.4.tgz#168da1a36e90da68ae8d49c0f1b48c7c6249213a"
@@ -1848,7 +1855,7 @@
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.5.2.tgz#eaf2f5699f73cef198454ebc0c414e3688898179"
   integrity sha512-gBxPg3aVO6J0kpfHNILc+NMhXnqHumFxOmjYCFfOiLZfwhnnfhtsdA2hfJlDnj+8PjAs6kKQPenOTKj3Rf7zHw==
 
-"@fortawesome/fontawesome-common-types@6.6.0":
+"@fortawesome/fontawesome-common-types@6.6.0", "@fortawesome/fontawesome-common-types@^6.6.0":
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-6.6.0.tgz#31ab07ca6a06358c5de4d295d4711b675006163f"
   integrity sha512-xyX0X9mc0kyz9plIyryrRbl7ngsA9jz77mCZJsUkLl+ZKs0KWObgaEBoSgQiYWAsSmjz/yjl0F++Got0Mdp4Rw==
@@ -1860,19 +1867,19 @@
   dependencies:
     "@fortawesome/fontawesome-common-types" "6.5.2"
 
-"@fortawesome/free-regular-svg-icons@^6.6.0":
+"@fortawesome/pro-regular-svg-icons@^6.6.0":
   version "6.6.0"
-  resolved "https://registry.yarnpkg.com/@fortawesome/free-regular-svg-icons/-/free-regular-svg-icons-6.6.0.tgz#fc49a947ac8dfd20403c9ea5f37f0919425bdf04"
-  integrity sha512-Yv9hDzL4aI73BEwSEh20clrY8q/uLxawaQ98lekBx6t9dQKDHcDzzV1p2YtBGTtolYtNqcWdniOnhzB+JPnQEQ==
+  resolved "https://npm.fontawesome.com/@fortawesome/pro-regular-svg-icons/-/6.6.0/pro-regular-svg-icons-6.6.0.tgz#b16ca3be86eb73834263f8664d1a3b7f64627a68"
+  integrity sha512-T6ifZKYhLrEOWD2sOdqyJBblSSg5WqhtlmcVWhWViKTt2ZDqw9WstW/lG2jQK9hv5S5tqJwruab6XUPQEZqs5A==
   dependencies:
     "@fortawesome/fontawesome-common-types" "6.6.0"
 
-"@fortawesome/free-solid-svg-icons@^6.5.2":
-  version "6.5.2"
-  resolved "https://registry.yarnpkg.com/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-6.5.2.tgz#9b40b077b27400a5e9fcbf2d15b986c7be69e9ca"
-  integrity sha512-QWFZYXFE7O1Gr1dTIp+D6UcFUF0qElOnZptpi7PBUMylJh+vFmIedVe1Ir6RM1t2tEQLLSV1k7bR4o92M+uqlw==
+"@fortawesome/pro-solid-svg-icons@^6.6.0":
+  version "6.6.0"
+  resolved "https://npm.fontawesome.com/@fortawesome/pro-solid-svg-icons/-/6.6.0/pro-solid-svg-icons-6.6.0.tgz#e4f99d9b674288c3d1ccbec27b37e008bd190ca1"
+  integrity sha512-IwYuyO+i681arIxOjPUoqRwoHeTqeg6i2s5rY2WbZ1R7PnwavOd1+aPHCJlfU2k8l5LZ+u3hAKlVqu+emQFlZg==
   dependencies:
-    "@fortawesome/fontawesome-common-types" "6.5.2"
+    "@fortawesome/fontawesome-common-types" "6.6.0"
 
 "@fortawesome/react-native-fontawesome@^0.3.1":
   version "0.3.2"
@@ -6489,10 +6496,10 @@ react-native-gesture-handler@^2.18.0:
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-react-native-reanimated@^3.14.0:
-  version "3.14.0"
-  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-3.14.0.tgz#2118265f3a5cad8c142633e36d76d0f0cc8cc9e8"
-  integrity sha512-TAxLtCfRyC/nOLeWoX/8MhdIF+Fi1e1NbLhIgEm5Kv9/gioAwSNaqLUYxjIClU1RaLwSTE8iaiHNVhTU4TS9DA==
+react-native-reanimated@~3.10.1:
+  version "3.10.1"
+  resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-3.10.1.tgz#3c37d1100bbba0065df39c96aab0c1ff1b50c0fa"
+  integrity sha512-sfxg6vYphrDc/g4jf/7iJ7NRi+26z2+BszPmvmk0Vnrz6FL7HYljJqTf531F1x6tFmsf+FEAmuCtTUIXFLVo9w==
   dependencies:
     "@babel/plugin-transform-arrow-functions" "^7.0.0-0"
     "@babel/plugin-transform-nullish-coalescing-operator" "^7.0.0-0"
