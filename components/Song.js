@@ -5,8 +5,8 @@ import { downloadsAtom, playlistAtom, playlistSyncAtom, updateDownloadsAtom } fr
 import { useAtom } from "jotai";
 import { indexAtom, tracksAtom } from "../storage/audioAtoms";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faStar as faStarSolid, faCloudArrowDown, faCircleDown } from "@fortawesome/free-solid-svg-icons";
-import { faStar as faStarRegular } from "@fortawesome/free-regular-svg-icons";
+import { faHeart as faHeartSolid } from "@fortawesome/pro-solid-svg-icons";
+import { faHeart as faHeartRegular, faSquareCheck, faCloudArrowDown } from "@fortawesome/pro-regular-svg-icons";
 import * as FileSystem from 'expo-file-system';
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -21,6 +21,7 @@ const Song = (props) => {
 
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [isFavorite, setIsFavorite] = useState(props.isFavorite);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     const play = () => {
         setTracks(props.tracks);
@@ -33,18 +34,21 @@ const Song = (props) => {
     };
 
     const download = async () => {
-        try {
-            const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'songs/');
-            
-            if(!dirInfo.exists) {
-                await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'songs/');
+        if(isDownloading === false) {
+            setIsDownloading(true);
+            try {
+                const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'songs/');
+                
+                if(!dirInfo.exists) {
+                    await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'songs/');
+                }
+
+                const { uri } = await FileSystem.createDownloadResumable(props.data.get('field_full_song').get('uri').url, FileSystem.documentDirectory + 'songs/' + props.data.get('id') + '.mp3', {}, updateDownloadProgress).downloadAsync();
+
+                setUpdateDownloads(true);
+            } catch (e) {
+                console.log(e);
             }
-
-            const { uri } = await FileSystem.createDownloadResumable(props.data.get('field_full_song').get('uri').url, FileSystem.documentDirectory + 'songs/' + props.data.get('id') + '.mp3', {}, updateDownloadProgress).downloadAsync();
-
-            setUpdateDownloads(true);
-        } catch (e) {
-            console.log(e);
         }
     };
 
@@ -68,28 +72,58 @@ const Song = (props) => {
         setIsFavorite(!isFavorite);
     };
 
-    let favoriteIcon = faStarRegular;
+    let favoriteIcon = faHeartRegular;
     if(isFavorite) {
-        favoriteIcon = faStarSolid;
+        favoriteIcon = faHeartSolid;
+    }
+
+    const deleteSong = async () => {
+        await FileSystem.deleteAsync(FileSystem.documentDirectory + 'songs/' + props.data.get('id') + '.mp3');
+        setUpdateDownloads(true);
+        setIsDownloading(false);
+    };
+
+    const deleteButton = () => {
+        return (
+            <TouchableOpacity style={Styles.deleteButton} onPress={deleteSong}>
+                <Text style={[Styles.textBig, Styles.textInverted]}>Delete</Text>
+            </TouchableOpacity>
+        );
+    };
+
+    let downloadIconStyle = Styles.download;
+    if(isDownloading) {
+        downloadIconStyle = Styles.isDownloading;
     }
 
     let downloadButton = (
         <TouchableOpacity onPress={download}>
-            <FontAwesomeIcon size={24} icon={faCloudArrowDown} />
+            <FontAwesomeIcon size={24} icon={faCloudArrowDown} style={downloadIconStyle} />
         </TouchableOpacity>
-
     );
+
+    let content = (
+        <View style={Styles.listItemContent}>
+            <Image style={Styles.listItemImage} src={props.data.get('field_image')?.get('uri')?.url} />
+
+            <Text style={[Styles.title, Styles.listTitle]}>{props.data.get('title')}</Text>
+
+            {downloadButton}
+
+            <TouchableOpacity onPress={toggleFavorite}>
+                <FontAwesomeIcon size={24} icon={favoriteIcon} style={Styles.favorite} />
+            </TouchableOpacity>
+        </View>
+    );
+
     if(downloads.includes(props.data.get('id') + '.mp3')) {
         downloadButton = (
-            <FontAwesomeIcon size={24} icon={faCircleDown} />
+            <FontAwesomeIcon size={24} icon={faSquareCheck} style={Styles.downloaded} />
         );
-    }
-    
-    return (
-        <View style={Styles.padded}>
-            <TouchableHighlight style={Styles.listItem} onPress={play}>
-                <GestureHandlerRootView>
-                <Swipeable>
+
+        content = (
+            <GestureHandlerRootView>
+                <Swipeable renderRightActions={deleteButton}>
                     <View style={Styles.listItemContent}>
                         <Image style={Styles.listItemImage} src={props.data.get('field_image')?.get('uri')?.url} />
 
@@ -98,11 +132,18 @@ const Song = (props) => {
                         {downloadButton}
 
                         <TouchableOpacity onPress={toggleFavorite}>
-                            <FontAwesomeIcon size={24} icon={favoriteIcon} />
+                            <FontAwesomeIcon size={24} icon={favoriteIcon} style={Styles.favorite} />
                         </TouchableOpacity>
                     </View>
                 </Swipeable>
-                </GestureHandlerRootView>
+            </GestureHandlerRootView>
+        );
+    }
+    
+    return (
+        <View>
+            <TouchableHighlight style={Styles.listItem} onPress={play}>
+                {content}
             </TouchableHighlight>
         </View>
     );

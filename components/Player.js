@@ -7,7 +7,7 @@ import { View, Text, TouchableHighlight, ActivityIndicator } from "react-native"
 import Slider from "@react-native-community/slider";
 import Styles from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faBackward, faForward, faPause, faPlay, faRotateLeft } from "@fortawesome/free-solid-svg-icons";
+import { faBackward, faForward, faPause, faPlay, faRotateLeft } from "@fortawesome/pro-solid-svg-icons";
 import * as FileSystem from 'expo-file-system';
 
 const Player = () => {

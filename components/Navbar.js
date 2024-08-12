@@ -1,6 +1,6 @@
 import { TouchableHighlight, View } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faHome, faCog, faMusic, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faCog, faMusic, faUser } from "@fortawesome/pro-solid-svg-icons";
 import Styles from "../styles";
 import { useNavigation } from "@react-navigation/native";
 

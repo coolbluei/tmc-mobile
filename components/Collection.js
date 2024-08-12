@@ -8,7 +8,7 @@ const Collection = (props) => {
     const navigation = useNavigation();
 
     return (
-        <View style={Styles.padded}>
+        <View>
             <TouchableHighlight style={Styles.listItem} onPress={() => navigation.navigate('Collection', { collectionId: props.data.get('id') })}>
                 <View style={Styles.listItemContent}>
                     <Image style={Styles.listItemImage} src={props.data.get('field_image').get('uri').url} />

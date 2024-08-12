@@ -13,6 +13,7 @@ const margin = 10;
 
 const white = '#ffffff';
 const greyLight = '#eeeeee';
+const greyMedium = '#aaaaaa';
 const greyDark = '#555555';
 const black = '#000000';
 
@@ -98,12 +99,9 @@ const Styles = StyleSheet.create({
     },
     listItem: {
         backgroundColor: greyLight,
-        padding: padding,
-        borderRadius: borderRadius,
-        marginTop: margin,
         width: '100%',
-        borderWidth: 2,
-        borderColor: greyDark,
+        borderTopWidth: 1,
+        borderColor: greyMedium,
         maxWidth: '100%',
         minWidth: '100%'
     },
@@ -113,7 +111,9 @@ const Styles = StyleSheet.create({
         flexBasis: 20,
         flex: 3,
         flexGrow: 10,
-        gap: padding
+        gap: padding,
+        padding: padding,
+        backgroundColor: greyLight
     },
     pageTitle: {
         fontSize: 22,
@@ -160,6 +160,31 @@ const Styles = StyleSheet.create({
     },
     alignCenter: {
         alignItems: 'center'
+    },
+    deleteButton: {
+        backgroundColor: '#f01132',
+        padding: padding,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textInverted: {
+        color: white
+    },
+    textBig: {
+        fontSize: 18
+    },
+    favorite: {
+        color: '#f52558'
+    },
+    downloaded: {
+        color: '#549441'
+    },
+    download: {
+        color: '#3b69d4'
+    },
+    isDownloading: {
+        color: greyMedium
     }
 });
 
