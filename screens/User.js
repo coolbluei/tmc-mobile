@@ -51,7 +51,7 @@ const User = () => {
         getUser();
     }, []);
 
-    const user = new Entity(userData.data);
+    const user = new Entity(userData);
 
     return (
         <SafeAreaView style={Styles.container}>
