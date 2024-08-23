@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, Text } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
 import { apiAtom, songDataAtom, playlistData, userDataAtom, playlistAtom } from "../storage/atoms";
@@ -16,15 +16,17 @@ const Collection = (props) => {
     const [playlists] = useAtom(playlistAtom)
 
     const [items, setItems] = useState();
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const currentTime = new Date().getTime();
 
     const getSongs = () => {
-        const currentTime = new Date().getTime();
 
         api.getEntity('node', 'collection', props.route.params.collectionId)
         .then((response) => {
             if(response.status === 200) {
                 const data = {
-                    expiration: currentTime,
+                    expiration: currentTime + (30 * 60 * 1000),
                     data: response.data.data,
                     included: response.data?.included
                 };
@@ -34,11 +36,17 @@ const Collection = (props) => {
         .catch((error) => {
             console.log('Songs.getSongs:', error);
         });
-    }
+    };
 
-    useEffect(() => {
+    const refresh = useCallback(() => {
+        setIsRefreshing(true);
+
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 2000);
+
         getSongs();
-    }, [])
+    }, []);
 
     useEffect(() => {
         if(songData instanceof Object && songData.hasOwnProperty('data')) {
@@ -95,10 +103,16 @@ const Collection = (props) => {
         }
     }
 
+    if(!songData || songData.expiration < currentTime) {
+        getSongs();
+    }
+
+    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;
+
     return (
         <SafeAreaView style={[Styles.container, Styles.content]}>
             <Text style={Styles.pageTitle}>{title}</Text>
-            <ScrollView contentContainerStyle={Styles.scroll}>
+            <ScrollView contentContainerStyle={Styles.scroll} refreshControl={refreshControl}>
                 {songDataContent}
             </ScrollView>
         </SafeAreaView>
