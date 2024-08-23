@@ -114,7 +114,19 @@ const Home = () => {
                         return true;
                     }
                 }}
+                onHttpError={(syntheticEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    console.warn(
+                      'WebView received error status code: ',
+                      nativeEvent.statusCode,
+                    )
+                }}
+                onError={(syntheticEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    console.warn('WebView error: ', nativeEvent);
+                }}
             />
+
         </SafeAreaView>
     );
 };
