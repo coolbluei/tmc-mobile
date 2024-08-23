@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, Text } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
 import { apiAtom, songDataAtom, playlistAtom, userDataAtom } from "../storage/atoms";
@@ -16,9 +16,11 @@ const Playlist = (props) => {
     const [playlists] = useAtom(playlistAtom);
 
     const [items, setItems] = useState();
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const currentTime = new Date().getTime();
 
     const getSongs = () => {
-        const currentTime = new Date().getTime();
 
         const params = {
             'filter[id][path]': 'id',
@@ -30,7 +32,7 @@ const Playlist = (props) => {
         .then((response) => {
             if(response.status === 200) {
                 const data = {
-                    expiration: currentTime,
+                    expiration: currentTime + (30 * 60 * 1000),
                     data: response.data.data,
                     included: response.data?.included
                 };
@@ -40,7 +42,17 @@ const Playlist = (props) => {
         .catch((error) => {
             console.log('Songs.getSongs:', error);
         });
-    }
+    };
+
+    const refresh = useCallback(() => {
+        setIsRefreshing(true);
+
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 2000);
+
+        getSongs();
+    }, []);
 
     useEffect(() => {
         getSongs();
@@ -103,10 +115,16 @@ const Playlist = (props) => {
         }
     }
 
+    if(!songData || songData.expiration < currentTime) {
+        getSongs();
+    }
+
+    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;
+
     return (
         <SafeAreaView style={[Styles.container, Styles.content]}>
             <Text style={Styles.pageTitle}>{title}</Text>
-            <ScrollView contentContainerStyle={Styles.scroll}>
+            <ScrollView contentContainerStyle={Styles.scroll} refreshControl={refreshControl}>
                 {songDataContent}
             </ScrollView>
         </SafeAreaView>

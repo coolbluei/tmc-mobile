@@ -1,6 +1,6 @@
-import { Linking, Platform, SafeAreaView, Text, View } from "react-native";
+import { Linking, Platform, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { apiAtom, credentialsAtom, userDataAtom, playlistAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import Styles from "../styles";
@@ -19,16 +19,13 @@ const Home = () => {
     const [playlists, setPlaylists] = useAtom(playlistAtom);
 
     const [centerMessage, setCenterMessage] = useState();
+    const [isRefreshing, setIsRefreshing] = useState(false);
 
     let message = null;
 
+    const currentTime = new Date().getTime();
+
     const getUser = () => {
-        const currentTime = new Date().getTime();
-
-        // if(userData && userData.expiration < currentTime) {
-        //     return userData.data;
-        // }
-
         const params = {
             'filter[email][path]': 'name',
             'filter[email][value]': credentials.username
@@ -38,7 +35,7 @@ const Home = () => {
         .then((response) => {
             if(response.status === 200) {
                 const data = {
-                    expiration: currentTime,
+                    expiration: currentTime + (30 * 60 * 1000),
                     data: response.data.data[0],
                     included: response.data?.included
                 };
@@ -49,9 +46,15 @@ const Home = () => {
         .catch((error) => {
             console.log('Home.getUser:', error);
         });
-    }
+    };
 
-    useEffect(() => {
+    const refresh = useCallback(() => {
+        setIsRefreshing(true);
+
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 2000);
+
         getUser();
     }, []);
 
@@ -85,14 +88,23 @@ const Home = () => {
         }
     }, [userData]);
 
+    if(!userData || userData.expiration < currentTime) {
+        getUser();
+    }
+
+    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;
+
     return (
         <SafeAreaView style={Styles.container}>
-            {centerMessage}
+            <ScrollView contentContainerStyle={[Styles.scroll, { flexShrink: 10 }]} refreshControl={refreshControl}>
+                {centerMessage}
+            </ScrollView>
+
             <WebView 
                 ref={webViewRef}
                 originWhitelist={['*']}
                 source={{ uri: uri }}
-                containerStyle={{width: '100%'}}
+                containerStyle={{width: '100%', flexGrow: 1000}}
                 javascriptEnabled={false}
                 onShouldStartLoadWithRequest={(request) => {
                     if(request.url !== uri && request.url !== "about:blank" && request.url !== 'about:srcdoc' && (Platform.OS === 'android' || request.url === request.mainDocumentURL)) {

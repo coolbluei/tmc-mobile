@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, Text } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
 import { apiAtom, collectionDataAtom, playlistAtom, userDataAtom } from "../storage/atoms";
@@ -16,9 +16,11 @@ const Collections = () => {
     const [playlists] = useAtom(playlistAtom);
 
     const [items, setItems] = useState();
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const currentTime = new Date().getTime();
 
     const getCollections = () => {
-        const currentTime = new Date().getTime();
 
         const user = new Entity(userData);
 
@@ -31,7 +33,7 @@ const Collections = () => {
         .then((response) => {
             if(response.status === 200) {
                 const data = {
-                    expiration: currentTime,
+                    expiration: currentTime + (30 * 60 * 1000),
                     data: response.data.data,
                     included: response.data?.included
                 };
@@ -43,7 +45,13 @@ const Collections = () => {
         });
     };
 
-    useEffect(() => {
+    const refresh = useCallback(() => {
+        setIsRefreshing(true);
+
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 2000);
+
         getCollections();
     }, []);
 
@@ -87,10 +95,16 @@ const Collections = () => {
         }
     }
 
+    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;
+
+    if(!collectionData || collectionData.expiration < currentTime) {
+        getCollections();
+    }
+
     return (
         <SafeAreaView style={[Styles.container, Styles.content]}>
             <Text style={Styles.pageTitle}>My Music</Text>
-            <ScrollView contentContainerStyle={Styles.scroll}>
+            <ScrollView contentContainerStyle={Styles.scroll} refreshControl={refreshControl}>
                 {collectionDataContent}
             </ScrollView>
         </SafeAreaView>
