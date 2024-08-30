@@ -1,6 +1,6 @@
-import { Button, SafeAreaView, Text } from "react-native";
+import { Button, Platform, SafeAreaView, Switch, Text, View } from "react-native";
 import { useAtom } from "jotai";
-import { accessTokenAtom, apiAtom, credentialsAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
+import { accessTokenAtom, apiAtom, biometricsEntrolledAtom, credentialsAtom, preferencesAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
 import { useEffect } from "react";
@@ -12,6 +12,8 @@ const User = () => {
     const [userData, setUserData] = useAtom(userDataAtom);
     const [api] = useAtom(apiAtom);
     const [credentials] = useAtom(credentialsAtom);
+    const [preferences, setPreferences] = useAtom(preferencesAtom);
+    const [biometricsEnrolled] = useAtom(biometricsEntrolledAtom);
 
     const logout = () => {
         setAccessToken(null);
@@ -20,10 +22,6 @@ const User = () => {
 
     const getUser = () => {
         const currentTime = new Date().getTime();
-
-        // if(userData && userData.expiration < currentTime) {
-        //     return userData.data;
-        // }
 
         const params = {
             'filter[email][path]': 'name',
@@ -53,9 +51,35 @@ const User = () => {
 
     const user = new Entity(userData);
 
+    const setBiometricsPreference = (value) => {
+        const newPreferences = {
+            useBiometrics: value
+        };
+
+        setPreferences(newPreferences);
+    };
+
+    let biometricsControl = null;
+    if(biometricsEnrolled) {
+        let biometricsLabel = 'Biometrics';
+        if(Platform.OS === 'ios') {
+            biometricsLabel = "FaceID";
+        }
+
+        biometricsControl = (
+            <View style={Styles.listItem}>
+                <View style={Styles.listItemContent}>
+                    <Text style={[Styles.title, Styles.controlTitle]}>Enable {biometricsLabel}</Text>
+                    <Switch style={[Styles.listTitle, Styles.controlContent]} value={preferences.useBiometrics} onValueChange={setBiometricsPreference} />
+                </View>
+            </View>
+        );
+    }
+
     return (
         <SafeAreaView style={Styles.container}>
-            <Text style={Styles.title}>{user.get('display_name')}</Text>
+            <Text style={Styles.pageTitle}>{user.get('display_name')}</Text>
+            {biometricsControl}
             <Button title="Logout" onPress={logout} />
         </SafeAreaView>
     );

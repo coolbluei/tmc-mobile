@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { Button, Image, KeyboardAvoidingView, Platform, Switch, Text, TextInput } from 'react-native';
-import { apiAtom, credentialsAtom, accessTokenAtom, preferencesAtom, refreshTokenAtom, pageIdAtom } from '../../storage/atoms';
+import { Button, Image, KeyboardAvoidingView, Platform, Text, TextInput } from 'react-native';
+import { apiAtom, credentialsAtom, accessTokenAtom, preferencesAtom, refreshTokenAtom, pageIdAtom, biometricsEntrolledAtom } from '../../storage/atoms';
 import Styles from '../../styles';
 import * as LocalAuthentication from 'expo-local-authentication';
 
@@ -10,7 +10,6 @@ const LoginForm = () => {
     const [usernameValue, setUsernameValue] = useState("");
     const [passwordValue, setPasswordValue] = useState("");
     const [message, setMessage] = useState();
-    const [hasBiometrics, setHasBiometrics] = useState(false);
 
     const [api] = useAtom(apiAtom);
     const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
@@ -18,26 +17,9 @@ const LoginForm = () => {
     const [pageId, setPageId] = useAtom(pageIdAtom);
     const [credentials, setCredentials] = useAtom(credentialsAtom);
     const [preferences, setPreferences] = useAtom(preferencesAtom);
-
-    useEffect(() => {
-        LocalAuthentication.hasHardwareAsync()
-        .then((result) => {
-            setHasBiometrics(result);
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }, []);
+    const [biometricsEnrolled] = useAtom(biometricsEntrolledAtom);
 
     let biometricsWidget = null;
-
-    const setBiometricsPreference = (value) => {
-        const newPreferences = {
-            useBiometrics: value
-        };
-
-        setPreferences(newPreferences);
-    };
 
     const login = async (usernameParameter = null, passwordParameter = null) => {
 
@@ -86,13 +68,15 @@ const LoginForm = () => {
         return false;
     }
 
-    if(hasBiometrics) {
+    biometricsWidget = null;
 
-        biometricsWidget = <Switch onValueChange={setBiometricsPreference} />;
-
-        if(preferences.useBiometrics && credentials instanceof Object && credentials.hasOwnProperty('username')) {
-            biometricsWidget = <Button title="Login with FaceID" onPress={biometricLogin} />
+    if(biometricsEnrolled && preferences.useBiometrics && credentials instanceof Object && credentials.hasOwnProperty('username')) {
+        let biometricsLabel = 'Biometrics';
+        if(Platform.OS === 'ios') {
+            biometricsLabel = "FaceID";
         }
+
+        biometricsWidget = <Button title={`Login with ${biometricsLabel}`} onPress={biometricLogin} />
     }
 
     return (
