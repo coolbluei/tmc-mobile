@@ -1,22 +1,22 @@
 import React from "react";
-import { Image, Text, TouchableHighlight, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import Styles from "../styles";
 import { useNavigation } from "@react-navigation/native";
 
-const Collection = (props) => {
+const Playlist = (props) => {
 
     const navigation = useNavigation();
 
     return (
-        <View style={Styles.padded}>
-            <TouchableHighlight style={Styles.listItem} onPress={() => navigation.navigate('Playlist', { playlistId: props.playlistId })}>
+        <View>
+            <TouchableOpacity style={Styles.listItem} onPress={() => navigation.navigate('Playlist', { playlistId: props.playlistId })}>
                 <View style={Styles.listItemContent}>
-                    <Image style={Styles.listItemImage} />
+                    <Image style={Styles.listItemImage} src={props.imageUrl} />
                     <Text style={Styles.title}>{props.title}</Text>
                 </View>
-            </TouchableHighlight>
+            </TouchableOpacity>
         </View>
     );
 };
 
-export default Collection;
+export default Playlist;

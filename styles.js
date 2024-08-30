@@ -129,7 +129,13 @@ const Styles = StyleSheet.create({
         flexShrink: 1,
     },
     listTitle: {
-        flexGrow: 1
+        flexGrow: 1,
+    },
+    controlTitle: {
+        flexGrow: 100
+    },
+    controlContent: {
+        flexShrink: 1,
     },
     player: {
         width: '100%',

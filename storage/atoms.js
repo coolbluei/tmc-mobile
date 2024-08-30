@@ -22,6 +22,7 @@ const downloadsAtom = atom([]);
 const updateDownloadsAtom = atom(true);
 const downloadQueueAtom = atom([]);
 const downloadsInProgressAtom = atom([]);
+const biometricsEntrolledAtom = atom(false);
 
 export { 
     apiAtom,
@@ -41,5 +42,6 @@ export {
     downloadsAtom,
     updateDownloadsAtom,
     downloadQueueAtom,
-    downloadsInProgressAtom
+    downloadsInProgressAtom,
+    biometricsEntrolledAtom
 };

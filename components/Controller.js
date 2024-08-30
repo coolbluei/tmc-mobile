@@ -40,7 +40,7 @@ const Controller = () => {
     };
 
     const downloadProgress = (progress) => {
-        if(progress.totalBytesWritten === progress.totalBytesExpectedToWrite) {
+        if(progress.totalBytesWritten / progress.totalBytesExpectedToWrite > 0.9) {
             removeSongFromDownloadQueue();
         }
     };
