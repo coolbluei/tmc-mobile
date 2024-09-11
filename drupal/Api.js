@@ -1,7 +1,8 @@
 import axios from 'axios';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
-import { accessTokenAtom, refreshTokenAtom, needsRefreshAtom } from '../storage/atoms';
+import { accessTokenAtom, refreshTokenAtom, needsRefreshAtom, offlineAtom } from '../storage/atoms';
 import QueryString from 'qs';
+import * as Network from 'expo-network';
 
 export default class Api {
 
@@ -14,6 +15,23 @@ export default class Api {
     setSession = (session) => {
         this.jotai.set(accessTokenAtom, session.access_token);
         this.jotai.set(refreshTokenAtom, session.refresh_token);
+    }
+
+    checkNetwork = async () => {
+        const networkStatus = await Network.getNetworkStateAsync();
+
+        if(networkStatus.isInternetReachable && networkStatus.isConnected) {
+            if(this.jotai.get(offlineAtom) === true) {
+                this.jotai.set(offlineAtom, false);
+            }
+            return true;
+        }
+        
+        if(this.jotai.get(offlineAtom) === false) {
+            this.jotai.set(offlineAtom, true);
+        }
+
+        return false;
     }
 
     login = async (username, password) => {
@@ -41,20 +59,26 @@ export default class Api {
     }
 
     refresh = async () => {
-        axios.post(this.drupal.getBaseUrl() + '/oauth/token', {
-            grant_type: 'refresh_token',
-            client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
-            refresh_token: await this.jotai.get(refreshTokenAtom)
-        })
-        .then(async (response) => {
-            this.setSession(response.data);
-            await this.jotai.set(needsRefreshAtom, false);
-            return response.data.access_token;
-        })
-        .catch((error) => {
-            this.jotai.set(needsRefreshAtom, true);
-            console.log('Api.refresh:', error);
-        });
+        if(this.checkNetwork()) {
+            axios.post(this.drupal.getBaseUrl() + '/oauth/token', {
+                grant_type: 'refresh_token',
+                client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
+                refresh_token: await this.jotai.get(refreshTokenAtom)
+            })
+            .then(async (response) => {
+                this.setSession(response.data);
+                await this.jotai.set(needsRefreshAtom, false);
+                return response.data.access_token;
+            })
+            .catch((error) => {
+                this.jotai.set(needsRefreshAtom, true);
+                this.jotai.set(refreshTokenAtom, null);
+                this.jotai.set(accessTokenAtom, null);
+                console.log('Api.refresh:', error);
+            });
+        }
+
+        return null;
     }
     
     retry = async (failedRequest) => {
@@ -65,43 +89,55 @@ export default class Api {
     }
 
     patchEntity = async (entityType, entityBundle, id, body) => {
-        let accessToken = await this.jotai.get(accessTokenAtom);
+        if(await this.checkNetwork()) {
+            let accessToken = await this.jotai.get(accessTokenAtom);
 
-        const options = this.getStandardHeaders(accessToken);
+            const options = this.getStandardHeaders(accessToken);
 
-        const response = await axios.patch(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() + `${entityType}/${entityBundle}/${id}`, body, options);
+            const response = await axios.patch(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() + `${entityType}/${entityBundle}/${id}`, body, options);
 
-        return Object.assign(response);
+            return Object.assign(response);
+        }
+
+        return null;
     }
 
     getEntity = async (entityType, entityBundle, id, params = {}) => {
+        if(await this.checkNetwork()) {
         
-        let accessToken = await this.jotai.get(accessTokenAtom);
-        
-        const options = this.getStandardHeaders(accessToken);
+            let accessToken = await this.jotai.get(accessTokenAtom);
+            
+            const options = this.getStandardHeaders(accessToken);
 
-        if(Object.keys(params) !== 0 && params.constructor === Object) {
-            this.addParametersAsOptions(options, params);
+            if(Object.keys(params) !== 0 && params.constructor === Object) {
+                this.addParametersAsOptions(options, params);
+            }
+
+            const response = await axios.get(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() +`${entityType}/${entityBundle}/${id}`, options);
+
+            return Object.assign(response);
         }
 
-        const response = await axios.get(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() +`${entityType}/${entityBundle}/${id}`, options);
-
-        return Object.assign(response);
+        return null;
     }
 
     getEntities = async (entityType, entityBundle, params = {}) => {
+        if(await this.checkNetwork()) {
 
-        let accessToken = await this.jotai.get(accessTokenAtom);
+            let accessToken = await this.jotai.get(accessTokenAtom);
 
-        const options = this.getStandardHeaders(accessToken);
+            const options = this.getStandardHeaders(accessToken);
 
-        if(Object.keys(params) !== 0 && params.constructor === Object) {
-            this.addParametersAsOptions(options, params);
+            if(Object.keys(params) !== 0 && params.constructor === Object) {
+                this.addParametersAsOptions(options, params);
+            }
+
+            const response = await axios.get(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() + `${entityType}/${entityBundle}`, options);
+
+            return response;
         }
 
-        const response = await axios.get(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() + `${entityType}/${entityBundle}`, options);
-
-        return response;
+        return null;
     }
 
     getStandardHeaders = (accessToken) => {

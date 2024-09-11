@@ -1,6 +1,6 @@
 import { Button, Platform, SafeAreaView, Switch, Text, View } from "react-native";
 import { useAtom } from "jotai";
-import { accessTokenAtom, apiAtom, biometricsEntrolledAtom, credentialsAtom, preferencesAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
+import { accessTokenAtom, apiAtom, biometricsEntrolledAtom, credentialsAtom, debugModeAtom, offlineAtom, preferencesAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
 import { useEffect } from "react";
@@ -14,6 +14,8 @@ const User = () => {
     const [credentials] = useAtom(credentialsAtom);
     const [preferences, setPreferences] = useAtom(preferencesAtom);
     const [biometricsEnrolled] = useAtom(biometricsEntrolledAtom);
+    const [offline, setOffline] = useAtom(offlineAtom);
+    const [debugMode, setDebugMode] = useAtom(debugModeAtom);
 
     const logout = () => {
         setAccessToken(null);
@@ -51,6 +53,18 @@ const User = () => {
 
     const user = new Entity(userData);
 
+    const toggleOffline = () => {
+        if(offline) {
+            api.checkNetwork();
+        } else {
+            setOffline(true);
+        }
+    }
+
+    const toggleDebugMode = () => {
+        setDebugMode(!debugMode);
+    }
+
     const setBiometricsPreference = (value) => {
         const newPreferences = {
             useBiometrics: value
@@ -80,6 +94,21 @@ const User = () => {
         <SafeAreaView style={Styles.container}>
             <Text style={Styles.pageTitle}>{user.get('display_name')}</Text>
             {biometricsControl}
+
+            <View style={Styles.listItem}>
+                <View style={Styles.listItemContent}>
+                    <Text style={[Styles.title, Styles.controlTitle]}>Offline Mode</Text>
+                    <Switch style={[Styles.listTitle, Styles.controlContent]} value={offline} onValueChange={toggleOffline} />
+                </View>
+            </View>
+
+            <View style={Styles.listItem}>
+                <View style={Styles.listItemContent}>
+                    <Text style={[Styles.title, Styles.controlTitle]}>Debug Mode</Text>
+                    <Switch style={[Styles.listTitle, Styles.controlContent]} value={debugMode} onValueChange={toggleDebugMode} />
+                </View>
+            </View>
+
             <Button title="Logout" onPress={logout} />
         </SafeAreaView>
     );

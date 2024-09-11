@@ -6,6 +6,7 @@ import { faSpinner } from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import ApiProvider from './components/ApiProvider';
 import { NavigationContainer } from '@react-navigation/native';
+import { ActivityIndicator } from 'react-native';
 
 export default function App() {
 
@@ -15,7 +16,7 @@ export default function App() {
     <Provider store={providerStore}>
       <ApiProvider store={providerStore}>
         <NavigationContainer>
-          <Suspense fallback={<FontAwesomeIcon icon={faSpinner}/>}>
+          <Suspense fallback={<ActivityIndicator size="large" color="#000000" />}>
             <AuthProvider />
           </Suspense>
           <StatusBar style="auto" />

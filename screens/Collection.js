@@ -6,6 +6,7 @@ import { apiAtom, songDataAtom, playlistData, userDataAtom, playlistAtom } from 
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Song from "../components/Song";
+import { useFocusEffect } from "@react-navigation/native";
 
 const Collection = (props) => {
 
@@ -37,6 +38,25 @@ const Collection = (props) => {
             console.log('Songs.getSongs:', error);
         });
     };
+
+    load = () => {
+        refresh();
+    };
+
+    unload = () => {
+        setSongData(null);
+        setItems(null);
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            load();
+
+            return () => {
+                unload();
+            };
+        }, [])
+    );
 
     const refresh = useCallback(() => {
         setIsRefreshing(true);
@@ -93,7 +113,11 @@ const Collection = (props) => {
 
     let songDataContent = null;
 
-    if(items instanceof Array) { 
+    if(!songData || songData.expiration < currentTime) {
+        getSongs();
+    }
+
+    if(items instanceof Array) {
         if(items.length > 0) {
             songDataContent = items;
         } else {
@@ -101,10 +125,6 @@ const Collection = (props) => {
                 <Text>Nothing to see here.</Text>
             );
         }
-    }
-
-    if(!songData || songData.expiration < currentTime) {
-        getSongs();
     }
 
     const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;

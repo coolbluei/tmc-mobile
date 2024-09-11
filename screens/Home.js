@@ -51,10 +51,6 @@ const Home = () => {
     const refresh = useCallback(() => {
         setIsRefreshing(true);
 
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 2000);
-
         getUser();
     }, []);
 
@@ -86,6 +82,8 @@ const Home = () => {
                 userDefined: []
             });
         }
+
+        setIsRefreshing(false);
     }, [userData]);
 
     if(!userData || userData.expiration < currentTime) {
