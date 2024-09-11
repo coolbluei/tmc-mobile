@@ -11,7 +11,7 @@ const Playlist = (props) => {
         <View>
             <TouchableOpacity style={Styles.listItem} onPress={() => navigation.navigate('Playlist', { playlistId: props.playlistId })}>
                 <View style={Styles.listItemContent}>
-                    <Image style={Styles.listItemImage} src={props.imageUrl} />
+                    <Image style={Styles.listItemImage} source={props.imageUrl} />
                     <Text style={Styles.title}>{props.title}</Text>
                 </View>
             </TouchableOpacity>
