@@ -70,7 +70,7 @@ const Collections = () => {
                 });
 
                 if(playlists.favorites.songs.length > 0) {
-                    content.unshift(<Playlist key="favorites" title="Favorites" playlistId="favorites" />);
+                    content.unshift(<Playlist key="favorites" title="Favorites" playlistId="favorites" imageUrl={require('../assets/favorites-icon.jpg')} />);
                 }
 
                 setItems(content);
