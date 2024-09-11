@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
+import { ActivityIndicator, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
 import { apiAtom, collectionDataAtom, playlistAtom, userDataAtom } from "../storage/atoms";
@@ -33,7 +33,7 @@ const Collections = () => {
         .then((response) => {
             if(response.status === 200) {
                 const data = {
-                    expiration: currentTime + (30 * 60 * 1000),
+                    expiration: currentTime + (1 * 60 * 1000),
                     data: response.data.data,
                     included: response.data?.included
                 };
@@ -47,10 +47,6 @@ const Collections = () => {
 
     const refresh = useCallback(() => {
         setIsRefreshing(true);
-
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 2000);
 
         getCollections();
     }, []);
@@ -81,16 +77,22 @@ const Collections = () => {
             }
             
         }
+
+        setIsRefreshing(false);
     }, [collectionData, playlists]);
 
-    let collectionDataContent = null;
+    let collectionDataContent = (
+        <View style={Styles.appWrapper}>
+            <ActivityIndicator size="large" color="#000000" />
+        </View>
+    );
 
     if(items instanceof Array) { 
         if(items.length > 0) {
             collectionDataContent = items;
         } else {
             collectionDataContent = (
-                <Text>Nothing to see here.</Text>
+                <Text>Nothing to see here yet. Register for a class to get Music!</Text>
             );
         }
     }
@@ -98,6 +100,7 @@ const Collections = () => {
     const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;
 
     if(!collectionData || collectionData.expiration < currentTime) {
+        console.log("Collections.noData");
         getCollections();
     }
 

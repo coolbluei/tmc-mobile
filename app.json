@@ -2,7 +2,7 @@
   "expo": {
     "name": "tmc",
     "slug": "tmc",
-    "version": "7.0.5",
+    "version": "7.0.6",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.themusicclass.ios",
-      "buildNumber": "2",
+      "buildNumber": "1",
       "infoPlist": {
         "NSFaceIDUsageDescription": "Allow TMC to use FaceID.",
         "UIBackgroundModes": [
@@ -26,7 +26,7 @@
       }
     },
     "android": {
-      "versionCode": 2,
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

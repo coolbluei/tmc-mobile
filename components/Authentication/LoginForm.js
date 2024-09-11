@@ -68,15 +68,27 @@ const LoginForm = () => {
         return false;
     }
 
+    const enableBiometrics = () => {
+        setPreferences({
+            useBiometrics: true
+        });
+    }
+
     biometricsWidget = null;
 
-    if(biometricsEnrolled && preferences.useBiometrics && credentials instanceof Object && credentials.hasOwnProperty('username')) {
+    if(biometricsEnrolled) {
         let biometricsLabel = 'Biometrics';
         if(Platform.OS === 'ios') {
             biometricsLabel = "FaceID";
         }
 
-        biometricsWidget = <Button title={`Login with ${biometricsLabel}`} onPress={biometricLogin} />
+        if(preferences.useBiometrics) {
+            if(credentials instanceof Object && credentials.hasOwnProperty('username')) {
+                biometricsWidget = <Button title={`Login with ${biometricsLabel}`} onPress={biometricLogin} />;
+            }
+        } else {
+            biometricsWidget = <Button title={`Enable ${biometricsLabel}`} onPress={enableBiometrics} />;
+        }
     }
 
     return (
