@@ -19,10 +19,11 @@ const DownloadManager = () => {
         let queue = [...downloadQueue];
         queue.shift();
         setDownloadQueue(queue);
+        setDebugErrors(queue.toString());
     };
 
     const downloadProgress = (progress) => {
-        if(progress.totalBytesWritten / progress.totalBytesExpectedToWrite === 1) {
+        if(progress.totalBytesWritten === progress.totalBytesExpectedToWrite) {
             removeSongFromDownloadQueue();
         }
     };
@@ -72,7 +73,6 @@ const DownloadManager = () => {
     if(debugMode) {
         debugContent = (
             <View style={Styles.highlight}>
-                <Text>{downloads.toString()}</Text>
                 <Text>{debugErrors}</Text>
             </View>
         )
