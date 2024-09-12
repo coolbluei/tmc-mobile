@@ -91,8 +91,8 @@ const Player = () => {
                     await Audio.setAudioModeAsync({
                         staysActiveInBackground: true,
                         playsInSilentModeIOS: true,
-                        interruptionModeIOS: InterruptionModeIOS.DuckOthers,
-                        interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+                        interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+                        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
                         shouldDuckAndroid: true,
                         playThroughEarpieceAndroid: true
                     });
