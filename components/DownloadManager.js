@@ -32,12 +32,6 @@ const DownloadManager = () => {
         try {
             const song = downloadQueue[0];
 
-            const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'songs/');
-            
-            if(!dirInfo.exists) {
-                await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'songs/');
-            }
-
             if(downloads.includes(song.get('id') + '.mp3') === false) {
                 await FileSystem.createDownloadResumable(song.get('field_full_song').get('uri').url, FileSystem.documentDirectory + 'songs/' + song.get('id') + '.mp3', {}, downloadProgress).downloadAsync();
             } else {
@@ -49,6 +43,19 @@ const DownloadManager = () => {
             setDebugErrors(e);
         }
     };
+
+    useEffect(() => {
+
+        const initializeSongsDirectory = async () => {
+            const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'songs/');
+
+            if(!dirInfo.exists) {
+                await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'songs/');
+            }    
+        };
+
+        initializeSongsDirectory();
+    }, []);
 
     useEffect(() => {
         if(downloadQueue.length === 0) {
