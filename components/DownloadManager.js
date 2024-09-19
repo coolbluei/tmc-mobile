@@ -40,6 +40,7 @@ const DownloadManager = () => {
 
     const downloadNextSong = async () => {
         try {
+            console.log('DownloadNextSong running...');
             // Get the first song in the queue.
             const song = downloadQueue[0];
 
@@ -54,25 +55,9 @@ const DownloadManager = () => {
         } catch (e) {
             console.log('DownloadNextSong:', e);
             setIsDownloading(false);
-            setDebugErrors(e);
+            setDebugErrors(`Download Queue Length: ${downloadQueue.length} Error Message: ${e}`);
         }
     };
-
-    // React to component mounting for the first time.
-    useEffect(() => {
-        const initializeSongsDirectory = async () => {
-            // Get the songs directory info.
-            const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'songs/');
-
-            // If the directory doesn't exist...
-            if(!dirInfo.exists) {
-                // Create the directory.
-                await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'songs/');
-            }    
-        };
-
-        initializeSongsDirectory();
-    }, []);
 
     // React to the downloadQueue being updated.
     useEffect(() => {
@@ -101,8 +86,12 @@ const DownloadManager = () => {
                 // Then update the downloads state.
                 setDownloads(data);
 
+                setDebugErrors('Downloads: ' + data.toString());
+
                 // And unset the updateDownloads trigger.
                 setUpdateDownloads(false);
+            }).catch((e) => {
+                setDebugErrors(e.toString());
             });
         }
     }, [updateDownloads]);
