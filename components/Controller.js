@@ -16,6 +16,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Entity from "../drupal/Entity";
 import DownloadManager from "./DownloadManager";
 import { useNavigation } from "@react-navigation/native";
+import * as FileSystem from 'expo-file-system';
+import OfflineCollection from "../screens/OfflineCollection";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +37,19 @@ const Controller = () => {
     const navigation = useNavigation();
 
     useEffect(() => {
+        const initializeSongsDirectory = async () => {
+            // Get the songs directory info.
+            const dirInfo = await FileSystem.getInfoAsync(FileSystem.documentDirectory + 'songs/');
+
+            // If the directory doesn't exist...
+            if(!dirInfo.exists) {
+                // Create the directory.
+                await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'songs/');
+            }
+        };
+
+        initializeSongsDirectory();
+
         if(api && isAuthenticated && credentials.hasOwnProperty('username')) {
             setIsInitialized(true);
         }
@@ -110,7 +125,8 @@ const Controller = () => {
                     <Stack.Navigator initialRouteName="Home" screenOptions={{headerShown: true}}>
                         <Stack.Screen name="Home" component={Home} options={{headerShown: false}} />
                         <Stack.Screen name="Collections" component={Collections} />
-                        <Stack.Screen name="My Downloads" component={OfflineCollections} options={{headerLeft: () => { null }}} />
+                        <Stack.Screen name="My Downloads" component={OfflineCollections} options={{headerLeft: () => { null }, headerBackVisible: false}} />
+                        <Stack.Screen name="Collection Downloads" component={OfflineCollection} />
                         <Stack.Screen name="Collection" component={Collection} />
                         <Stack.Screen name="Playlist" component={Playlist} />
                         <Stack.Screen name="User" component={User} />

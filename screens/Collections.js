@@ -26,7 +26,7 @@ const Collections = () => {
 
         const params = {
             'include': 'field_application_access,field_application_access.field_image,field_application_access.field_songs,field_application_access.field_songs.field_full_song',
-            'fields[user--user]': 'id,field_application_access'
+            'fields[user--user]': 'id,field_application_access,field_application_access.field_songs'
         };
 
         api.getEntity('user', 'user', user.get('id'), params)

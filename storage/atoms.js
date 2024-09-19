@@ -13,9 +13,10 @@ const preferencesAtom = atomWithStorage('preferences', { useBiometrics: false },
 const playlistAtom = atomWithStorage('playlists', { favorites: { id: 'favorites', title: 'Favorites', songs: [] }, userDefined: [] }, storage);
 const playlistSyncAtom = atomWithStorage('playlistsSync', false, storage);
 const lastPlaylistSyncAtom = atomWithStorage('lastPlaylistSync', 0, storage);
+const collectionDataAtom = atomWithStorage('collectionData', null, storage);
+
 const songDataAtom = atom();
 const userDataAtom = atom();
-const collectionDataAtom = atom();
 const needsRefreshAtom = atom(true);
 const isAuthenticatedAtom = atom(false);
 const downloadsAtom = atom([]);
