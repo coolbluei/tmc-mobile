@@ -1,6 +1,6 @@
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { Button, Image, KeyboardAvoidingView, Platform, Text, TextInput } from 'react-native';
+import { Button, Image, KeyboardAvoidingView, Platform, Switch, Text, TextInput, View } from 'react-native';
 import { apiAtom, credentialsAtom, accessTokenAtom, preferencesAtom, refreshTokenAtom, pageIdAtom, biometricsEntrolledAtom } from '../../storage/atoms';
 import Styles from '../../styles';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -66,9 +66,9 @@ const LoginForm = () => {
         return false;
     }
 
-    const enableBiometrics = () => {
+    const setBiometricsPreference = () => {
         setPreferences({
-            useBiometrics: true
+            useBiometrics: !preferences.useBiometrics
         });
     }
 
@@ -85,7 +85,12 @@ const LoginForm = () => {
                 biometricsWidget = <Button title={`Login with ${biometricsLabel}`} onPress={biometricLogin} />;
             }
         } else {
-            biometricsWidget = <Button title={`Enable ${biometricsLabel}`} onPress={enableBiometrics} />;
+            biometricsWidget = (
+                <View style={Styles.alignCenter}>
+                    <Text>Enable {biometricsLabel} for future logins</Text>
+                    <Switch value={preferences.useBiometrics} onValueChange={setBiometricsPreference} />
+                </View>
+            );
         }
     }
 
