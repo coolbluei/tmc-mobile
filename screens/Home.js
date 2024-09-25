@@ -1,11 +1,11 @@
 import { Linking, Platform, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { apiAtom, credentialsAtom, userDataAtom, playlistAtom } from "../storage/atoms";
+import { userDataAtom, isRefreshingAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
-import Include from "../drupal/Include";
+import useUserData from '../drupal/useUserData.js';
 
 const Home = () => {
 
@@ -13,45 +13,18 @@ const Home = () => {
 
     const webViewRef = useRef(null);
 
-    const [userData, setUserData] = useAtom(userDataAtom);
-    const [api] = useAtom(apiAtom);
-    const [credentials] = useAtom(credentialsAtom);
-    const [playlists, setPlaylists] = useAtom(playlistAtom);
+    const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
+    const [userData] = useAtom(userDataAtom);
 
     const [centerMessage, setCenterMessage] = useState();
-    const [isRefreshing, setIsRefreshing] = useState(false);
 
     let message = null;
 
-    const currentTime = new Date().getTime();
-
-    const getUser = () => {
-        const params = {
-            'filter[email][path]': 'name',
-            'filter[email][value]': credentials.username
-        };
-
-        api.getEntities('user', 'user', params)
-        .then((response) => {
-            if(response.status === 200) {
-                const data = {
-                    expiration: currentTime + (30 * 60 * 1000),
-                    data: response.data.data[0],
-                    included: response.data?.included
-                };
-
-                setUserData(data);
-            }
-        })
-        .catch((error) => {
-            console.log('Home.getUser:', error);
-        });
-    };
+    const getUserData = useUserData();
 
     const refresh = useCallback(() => {
         setIsRefreshing(true);
-
-        getUser();
+        getUserData();
     }, []);
 
     useEffect(() => {
@@ -62,33 +35,8 @@ const Home = () => {
             if(message) {
                 setCenterMessage(<View style={Styles.highlight}><Text>{message}</Text></View>);
             }
-
-            let favorites = {
-                title: 'Favorites',
-                id: 'favorites',
-                songs: []
-            };
-
-            if(user.get('field_favorites') instanceof Array) {
-                favorites.songs = user.get('field_favorites').data.map((song) => song.get('id'));
-            } else if(user.get('field_favorites') instanceof Include) {
-                favorites.songs = [
-                    user.get('field_favorites').get('id')
-                ];
-            }
-
-            setPlaylists({
-                favorites: favorites,
-                userDefined: []
-            });
         }
-
-        setIsRefreshing(false);
     }, [userData]);
-
-    if(!userData || userData.expiration < currentTime) {
-        getUser();
-    }
 
     const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;
 

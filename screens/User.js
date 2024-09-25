@@ -1,9 +1,11 @@
+import React, { useState } from 'react';
 import { Button, Platform, SafeAreaView, Switch, Text, View } from "react-native";
 import { useAtom } from "jotai";
 import { accessTokenAtom, apiAtom, biometricsEntrolledAtom, credentialsAtom, debugModeAtom, offlineAtom, preferencesAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
 import { useEffect } from "react";
+import useUserData from "../drupal/useUserData";
 
 const User = () => {
 
@@ -17,41 +19,14 @@ const User = () => {
     const [offline, setOffline] = useAtom(offlineAtom);
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
 
+    const [name, setName] = useState();
+
+    const getUserData = useUserData();
+
     const logout = () => {
         setAccessToken(null);
         setRefreshToken(null);
     };
-
-    const getUser = () => {
-        const currentTime = new Date().getTime();
-
-        const params = {
-            'filter[email][path]': 'name',
-            'filter[email][value]': credentials.username
-        };
-
-        api.getEntities('user', 'user', params)
-        .then((response) => {
-            if(response.status === 200) {
-                const data = {
-                    expiration: currentTime,
-                    data: response.data.data[0],
-                    included: response.data?.included
-                };
-
-                setUserData(data);
-            }
-        })
-        .catch((error) => {
-            console.log('Home.getUser:', error);
-        });
-    }
-
-    useEffect(() => {
-        getUser();
-    }, []);
-
-    const user = new Entity(userData);
 
     const toggleOffline = () => {
         if(offline) {
@@ -60,6 +35,13 @@ const User = () => {
             setOffline(true);
         }
     }
+
+    useEffect(() => {
+        getUserData();
+        
+        const user = new Entity(userData);
+        setName(user.get('display_name'));
+    }, []);
 
     const toggleDebugMode = () => {
         setDebugMode(!debugMode);
@@ -92,7 +74,7 @@ const User = () => {
 
     return (
         <SafeAreaView style={Styles.container}>
-            <Text style={Styles.pageTitle}>{user.get('display_name')}</Text>
+            <Text style={Styles.pageTitle}>{name}</Text>
             {biometricsControl}
 
             <View style={Styles.listItem}>

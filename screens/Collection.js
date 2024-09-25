@@ -2,121 +2,114 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { apiAtom, songDataAtom, playlistData, userDataAtom, playlistAtom } from "../storage/atoms";
+import { userDataAtom, playlistAtom, isRefreshingAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Song from "../components/Song";
 import { useFocusEffect } from "@react-navigation/native";
+import useUserData from "../drupal/useUserData";
 
 const Collection = (props) => {
 
-    const [songData, setSongData] = useAtom(songDataAtom);
-    const [api] = useAtom(apiAtom);
     const [title, setTitle] = useState();
     const [userData] = useAtom(userDataAtom);
-    const [playlists] = useAtom(playlistAtom)
+    const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
 
     const [items, setItems] = useState();
-    const [isRefreshing, setIsRefreshing] = useState(false);
 
-    const currentTime = new Date().getTime();
+    const getUserData = useUserData();
 
-    const getSongs = () => {
+    // Refresh the screen data.
+    const refresh = useCallback(() => {
+        // Set isRefreshing so that the spinner displays
+        setIsRefreshing(true);
+        getUserData();
+    }, []);
 
-        api.getEntity('node', 'collection', props.route.params.collectionId)
-        .then((response) => {
-            if(response.status === 200) {
-                const data = {
-                    expiration: currentTime + (30 * 60 * 1000),
-                    data: response.data.data,
-                    included: response.data?.included
-                };
-                setSongData(data);
-            }
-        })
-        .catch((error) => {
-            console.log('Songs.getSongs:', error);
-        });
-    };
-
-    load = () => {
+    // A callback to refresh the screen.
+    const load = () => {
         refresh();
     };
 
-    unload = () => {
-        setSongData(null);
+    // A callback to reset the screen.
+    const unload = () => {
         setItems(null);
     }
 
+    // When the screen becomes focused.
     useFocusEffect(
         useCallback(() => {
+            // Load the data.
             load();
 
+            // Cleanup for when the screen becomes unfocused.
             return () => {
                 unload();
             };
         }, [])
     );
 
-    const refresh = useCallback(() => {
-        setIsRefreshing(true);
-
-        setTimeout(() => {
-            setIsRefreshing(false);
-        }, 2000);
-
-        getSongs();
-    }, []);
-
+    // React to userData being updated.
     useEffect(() => {
-        if(songData instanceof Object && songData.hasOwnProperty('data')) {
-            const collection = new Entity(songData);
+        // If we have a userData object and it has a data property...
+        if(userData instanceof Object && userData.hasOwnProperty('data')) {
+            // create a user entity fromt the songData.
+            const user = new Entity(userData);
 
+            const collections = user.get('field_application_access');
+
+            const favorites = user.get('field_favorites');
+
+            const collection = collections.find((element) => element.get('id') === props.route.params.collectionId);
+
+            // Initialize a list of songs.
             let songs = [];
 
-            if(collection instanceof Entity && collection.hasOwnProperty('data')) {
+            // If we have a collection Entity and it has a data property...
+            if(collection instanceof Include && collection.hasOwnProperty('data')) {
+                // Get the songs from the collection.
                 songs = collection.get('field_songs');
+
+                // Set the screen title to the collection title.
                 setTitle(collection.get('title'));
             }
 
+            // If we have a list of songs...
             if(songs instanceof Array && songs.length > 0) {
-                const trackItems = songs.map((element) => {
-                    const song = new Include(element, collection.included);
+                // Map each song to a trackItem object that the Player can handle.
+                const trackItems = songs.map((song) => {
+                    // Populate all the properties the Player needs for each song.
                     return {
                         title: song.get('title'),
                         artist: collection.get('title'),
                         artwork: song.get('field_image')?.get('uri')?.url,
-                        url: song.get('field_full_song').get('uri').url,
+                        url: song.get('field_full_song').get('uri')?.url,
                         id: song.get('id'),
                     };
                 })
 
-                const content = songs.map((element, i) => {
-                    const song = new Include(element, collection.included);
-
-                    const user = new Entity(userData);
+                // Map each song to a Song component for display.
+                const content = songs.map((song, i) => {
+                    // Determine if the song is a favorite.
                     let isFavorite = false;
-
-                    if(playlists.favorites.songs.find((e) => e === element.get('id'))) {
+                    if(favorites instanceof Array && favorites.find((e) => e.get('id') === song.get('id'))) {
                         isFavorite = true;
                     }
 
+                    // Create the Song component for each song.
                     return (
                         <Song key={song.get('id')} data={song} trackIndex={i} isFavorite={isFavorite} tracks={trackItems} />
                     );
                 });
 
+                // Set the items list to the list of Song components.
                 setItems(content);
             }
         }
-    }, [songData]);
+    }, [userData]);
 
+    // Set the content for the screen.
     let songDataContent = null;
-
-    if(!songData || songData.expiration < currentTime) {
-        getSongs();
-    }
-
     if(items instanceof Array) {
         if(items.length > 0) {
             songDataContent = items;
@@ -127,6 +120,7 @@ const Collection = (props) => {
         }
     }
 
+    // Create a swipe down to refresh widget.
     const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;
 
     return (
