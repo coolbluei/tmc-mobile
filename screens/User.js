@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Platform, SafeAreaView, Switch, Text, View } from "react-native";
 import { useAtom } from "jotai";
-import { accessTokenAtom, apiAtom, biometricsEntrolledAtom, credentialsAtom, debugModeAtom, offlineAtom, preferencesAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
+import { accessTokenAtom, apiAtom, biometricsEntrolledAtom, debugModeAtom, offlineAtom, preferencesAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
 import { useEffect } from "react";
@@ -11,9 +11,8 @@ const User = () => {
 
     const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
     const [refreshToken, setRefreshToken] = useAtom(refreshTokenAtom);
-    const [userData, setUserData] = useAtom(userDataAtom);
+    const [userData] = useAtom(userDataAtom);
     const [api] = useAtom(apiAtom);
-    const [credentials] = useAtom(credentialsAtom);
     const [preferences, setPreferences] = useAtom(preferencesAtom);
     const [biometricsEnrolled] = useAtom(biometricsEntrolledAtom);
     const [offline, setOffline] = useAtom(offlineAtom);

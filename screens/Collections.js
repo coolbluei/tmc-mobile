@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { playlistAtom, isRefreshingAtom, userDataAtom } from "../storage/atoms";
+import { isRefreshingAtom, userDataAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Collection from "../components/Collection";
 import Playlist from "../components/Playlist";

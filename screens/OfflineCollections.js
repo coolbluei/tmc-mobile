@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView } from 'react-native';
 import { useAtom } from 'jotai';
-import { downloadsAtom, collectionDataAtom, userDataAtom } from '../storage/atoms';
+import { downloadsAtom, userDataAtom } from '../storage/atoms';
 import OfflineCollection from '../components/OfflineCollection';
 import Entity from '../drupal/Entity';
 import Styles from '../styles';
