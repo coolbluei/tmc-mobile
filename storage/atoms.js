@@ -14,9 +14,9 @@ const playlistAtom = atomWithStorage('playlists', { favorites: { id: 'favorites'
 const playlistSyncAtom = atomWithStorage('playlistsSync', false, storage);
 const lastPlaylistSyncAtom = atomWithStorage('lastPlaylistSync', 0, storage);
 const collectionDataAtom = atomWithStorage('collectionData', null, storage);
+const userDataAtom = atomWithStorage('userData', null, storage);
 
 const songDataAtom = atom();
-const userDataAtom = atom();
 const needsRefreshAtom = atom(true);
 const isAuthenticatedAtom = atom(false);
 const downloadsAtom = atom([]);
@@ -26,6 +26,7 @@ const downloadsInProgressAtom = atom([]);
 const biometricsEntrolledAtom = atom(false);
 const offlineAtom = atom(true);
 const debugModeAtom = atom(false);
+const isRefreshingAtom = atom(false);
 
 export { 
     apiAtom,
@@ -48,5 +49,6 @@ export {
     downloadsInProgressAtom,
     biometricsEntrolledAtom,
     offlineAtom,
-    debugModeAtom
+    debugModeAtom,
+    isRefreshingAtom
 };

@@ -1,4 +1,4 @@
-import { apiAtom, credentialsAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, userDataAtom, offlineAtom } from "../storage/atoms";
+import { apiAtom, credentialsAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, userDataAtom, offlineAtom, isRefreshingAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
@@ -18,6 +18,7 @@ import DownloadManager from "./DownloadManager";
 import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from 'expo-file-system';
 import OfflineCollection from "../screens/OfflineCollection";
+import useUserData from "../drupal/useUserData";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,10 +32,13 @@ const Controller = () => {
     const [lastPlaylistSync, setLastPlaylistSync] = useAtom(lastPlaylistSyncAtom);
     const [userData] = useAtom(userDataAtom);
     const [offline] = useAtom(offlineAtom);
+    const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
 
     const [isInitialized, setIsInitialized] = useState(false);
 
     const navigation = useNavigation();
+
+    const getUserData = useUserData();
 
     useEffect(() => {
         const initializeSongsDirectory = async () => {
@@ -67,11 +71,9 @@ const Controller = () => {
 
     useEffect(() => {
         if(api && playlistSync && userData) {
-            console.log('reacting to playlist sync');
             const currentTime = new Date().getTime();
 
             if(currentTime > lastPlaylistSync + (30 * 1000)) {
-                console.log('starting write');
             
                 const user = new Entity(userData);
 
@@ -97,9 +99,10 @@ const Controller = () => {
                 api.patchEntity('user', 'user', user.get('id'), body)
                 .then((response) => {
                     if(response.status === 200) {
-                        console.log('write successful');
                         setPlaylistSync(false);
                         setLastPlaylistSync(currentTime);
+                        setIsRefreshing(true);
+                        getUserData();
                     }
                 })
                 .catch((error) => {
