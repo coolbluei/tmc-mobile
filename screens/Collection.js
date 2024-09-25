@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { userDataAtom, playlistAtom, isRefreshingAtom } from "../storage/atoms";
+import { userDataAtom, isRefreshingAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Song from "../components/Song";

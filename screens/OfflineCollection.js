@@ -1,12 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
+import { useEffect, useState } from "react";
+import { SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { apiAtom, songDataAtom, playlistData, userDataAtom, playlistAtom, collectionDataAtom, downloadsAtom } from "../storage/atoms";
+import { userDataAtom, downloadsAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
-import Include from "../drupal/Include";
-import Song from "../components/Song";
-import { useFocusEffect } from "@react-navigation/native";
 import OfflineSong from "../components/OfflineSong";
 
 const OfflineCollection = (props) => {
