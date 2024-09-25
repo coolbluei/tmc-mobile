@@ -60,22 +60,25 @@ export default class Api {
 
     refresh = async () => {
         if(this.checkNetwork()) {
-            axios.post(this.drupal.getBaseUrl() + '/oauth/token', {
-                grant_type: 'refresh_token',
-                client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
-                refresh_token: await this.jotai.get(refreshTokenAtom)
-            })
-            .then(async (response) => {
-                this.setSession(response.data);
-                await this.jotai.set(needsRefreshAtom, false);
-                return response.data.access_token;
-            })
-            .catch((error) => {
-                this.jotai.set(needsRefreshAtom, true);
-                this.jotai.set(refreshTokenAtom, null);
-                this.jotai.set(accessTokenAtom, null);
-                console.log('Api.refresh:', error);
-            });
+            const refreshToken = await this.jotai.get(refreshTokenAtom);
+            if(refreshToken instanceof String) {
+                axios.post(this.drupal.getBaseUrl() + '/oauth/token', {
+                    grant_type: 'refresh_token',
+                    client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
+                    refresh_token: refreshToken
+                })
+                .then(async (response) => {
+                    this.setSession(response.data);
+                    await this.jotai.set(needsRefreshAtom, false);
+                    return response.data.access_token;
+                })
+                .catch((error) => {
+                    this.jotai.set(needsRefreshAtom, false);
+                    this.jotai.set(refreshTokenAtom, null);
+                    this.jotai.set(accessTokenAtom, null);
+                    console.log('Api.refresh:', error);
+                });
+            }
         }
 
         return null;

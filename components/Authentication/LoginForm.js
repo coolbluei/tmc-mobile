@@ -14,7 +14,6 @@ const LoginForm = () => {
     const [api] = useAtom(apiAtom);
     const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
     const [refreshToken, setRefreshToken] = useAtom(refreshTokenAtom);
-    const [pageId, setPageId] = useAtom(pageIdAtom);
     const [credentials, setCredentials] = useAtom(credentialsAtom);
     const [preferences, setPreferences] = useAtom(preferencesAtom);
     const [biometricsEnrolled] = useAtom(biometricsEntrolledAtom);
@@ -41,7 +40,6 @@ const LoginForm = () => {
             if(response.status === 200) {
                 setAccessToken(response.data.access_token);
                 setRefreshToken(response.data.refresh_token);
-                setPageId('Home');
                 setCredentials({
                     username: username,
                     password: password
