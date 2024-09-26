@@ -11,7 +11,7 @@ const User = () => {
 
     const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
     const [refreshToken, setRefreshToken] = useAtom(refreshTokenAtom);
-    const [userData] = useAtom(userDataAtom);
+    const [userData, setUserData] = useAtom(userDataAtom);
     const [api] = useAtom(apiAtom);
     const [preferences, setPreferences] = useAtom(preferencesAtom);
     const [biometricsEnrolled] = useAtom(biometricsEntrolledAtom);
@@ -20,11 +20,11 @@ const User = () => {
 
     const [name, setName] = useState();
 
-    const getUserData = useUserData();
 
     const logout = () => {
         setAccessToken(null);
         setRefreshToken(null);
+        setUserData(null);
     };
 
     const toggleOffline = () => {
@@ -36,8 +36,6 @@ const User = () => {
     }
 
     useEffect(() => {
-        getUserData();
-        
         const user = new Entity(userData);
         setName(user.get('display_name'));
     }, []);

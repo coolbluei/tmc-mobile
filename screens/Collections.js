@@ -49,8 +49,6 @@ const Collections = () => {
             }
             
         }
-
-        setIsRefreshing(false);
     }, [userData]);
 
     let collectionDataContent = (

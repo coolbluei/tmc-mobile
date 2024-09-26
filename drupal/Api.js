@@ -109,7 +109,7 @@ export default class Api {
         if(await this.checkNetwork()) {
         
             let accessToken = await this.jotai.get(accessTokenAtom);
-            
+
             const options = this.getStandardHeaders(accessToken);
 
             if(Object.keys(params) !== 0 && params.constructor === Object) {

@@ -71,6 +71,7 @@ const Controller = () => {
 
     useEffect(() => {
         if(api && playlistSync && userData) {
+            console.log('Controller playlistSync')
             const currentTime = new Date().getTime();
 
             if(currentTime > lastPlaylistSync + (30 * 1000)) {
