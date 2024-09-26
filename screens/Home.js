@@ -22,6 +22,10 @@ const Home = () => {
 
     const getUserData = useUserData();
 
+    useEffect(() => {
+        getUserData();
+    }, [])
+
     const refresh = useCallback(() => {
         setIsRefreshing(true);
         getUserData();

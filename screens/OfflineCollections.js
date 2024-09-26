@@ -18,17 +18,22 @@ const OfflineCollections = () => {
         let collectionItems = [];
         if(userData instanceof Object && userData.hasOwnProperty('data')) {
             const user = new Entity(userData);
-            for(const collection of user.get('field_application_access')) {
-                let availableSongs = [];
-                const collectionSongs = collection.get('field_songs');
-                for(const song of collectionSongs) {
-                    if(downloads.includes(song.get('id') + '.mp3')) {
-                        availableSongs.push(song.get('id'));
-                    }
-                }
+            const collections = user.get('field_application_access');
+            if(collections instanceof Array) {
+                for(const collection of collections) {
+                    let availableSongs = [];
+                    const collectionSongs = collection.get('field_songs');
+                    if(collectionSongs instanceof Array) {
+                        for(const song of collectionSongs) {
+                            if(downloads.includes(song.get('id') + '.mp3')) {
+                                availableSongs.push(song.get('id'));
+                            }
+                        }
 
-                if(availableSongs.length > 0) {
-                    collectionItems.push(<OfflineCollection key={collection.get('id')} data={collection} songs={collectionSongs} availableSongs={availableSongs} />);
+                        if(availableSongs.length > 0) {
+                            collectionItems.push(<OfflineCollection key={collection.get('id')} data={collection} songs={collectionSongs} availableSongs={availableSongs} />);
+                        }
+                    }
                 }
             }
         }

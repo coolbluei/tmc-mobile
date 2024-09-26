@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { Button, Image, KeyboardAvoidingView, Platform, Switch, Text, TextInput, View } from 'react-native';
-import { apiAtom, credentialsAtom, accessTokenAtom, preferencesAtom, refreshTokenAtom, biometricsEntrolledAtom } from '../../storage/atoms';
+import { apiAtom, credentialsAtom, accessTokenAtom, preferencesAtom, refreshTokenAtom, biometricsEntrolledAtom, userDataAtom } from '../../storage/atoms';
 import Styles from '../../styles';
 import * as LocalAuthentication from 'expo-local-authentication';
 
