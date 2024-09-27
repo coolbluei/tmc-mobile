@@ -1,4 +1,4 @@
-import { apiAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, userDataAtom, offlineAtom, isRefreshingAtom, sessionAtom } from "../storage/atoms";
+import { apiAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, userDataAtom, offlineAtom, isRefreshingAtom, sessionAtom, needsDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
@@ -33,6 +33,7 @@ const Controller = () => {
     const [offline] = useAtom(offlineAtom);
     const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
     const [session] = useAtom(sessionAtom);
+    const [needsData] = useAtom(needsDataAtom);
 
     const [isInitialized, setIsInitialized] = useState(false);
 
@@ -75,6 +76,12 @@ const Controller = () => {
             setIsRefreshing(true);
         }
     }, [session]);
+
+    useEffect(() => {
+        if(needsData && !offline) {
+            getUserData(false);
+        }
+    }, [needsData]);
 
     useEffect(() => {
         if(isRefreshing) {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { isRefreshingAtom, userDataAtom } from "../storage/atoms";
+import { isRefreshingAtom, needsDataAtom, userDataAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Collection from "../components/Collection";
 import Playlist from "../components/Playlist";
@@ -11,6 +11,7 @@ const Collections = () => {
 
     const [userData] = useAtom(userDataAtom);
     const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
+    const [needsData, setNeedsData] = useAtom(needsDataAtom);
 
     const [items, setItems] = useState();
 
@@ -44,6 +45,8 @@ const Collections = () => {
                 setItems(content);
             }
             
+        } else {
+            setNeedsData(true);
         }
     }, [userData]);
 
