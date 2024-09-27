@@ -15,11 +15,8 @@ const Playlist = (props) => {
     const [items, setItems] = useState();
     const [title, setTitle] = useState();
 
-    const getUserData = useUserData();
-
     const refresh = useCallback(() => {
         setIsRefreshing(true);
-        getUserData();
     }, []);
 
     useEffect(() => {

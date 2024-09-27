@@ -7,7 +7,6 @@ import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Song from "../components/Song";
 import { useFocusEffect } from "@react-navigation/native";
-import useUserData from "../drupal/useUserData";
 
 const Collection = (props) => {
 
@@ -17,13 +16,10 @@ const Collection = (props) => {
 
     const [items, setItems] = useState();
 
-    const getUserData = useUserData();
-
     // Refresh the screen data.
     const refresh = useCallback(() => {
         // Set isRefreshing so that the spinner displays
         setIsRefreshing(true);
-        getUserData();
     }, []);
 
     // A callback to refresh the screen.

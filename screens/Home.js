@@ -5,7 +5,6 @@ import { userDataAtom, isRefreshingAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
-import useUserData from '../drupal/useUserData.js';
 
 const Home = () => {
 
@@ -20,15 +19,8 @@ const Home = () => {
 
     let message = null;
 
-    const getUserData = useUserData();
-
-    useEffect(() => {
-        getUserData();
-    }, [])
-
     const refresh = useCallback(() => {
         setIsRefreshing(true);
-        getUserData();
     }, []);
 
     useEffect(() => {

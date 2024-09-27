@@ -1,6 +1,6 @@
 import axios from 'axios';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
-import { accessTokenAtom, refreshTokenAtom, needsRefreshAtom, offlineAtom } from '../storage/atoms';
+import { needsRefreshAtom, offlineAtom, sessionAtom } from '../storage/atoms';
 import QueryString from 'qs';
 import * as Network from 'expo-network';
 
@@ -12,9 +12,14 @@ export default class Api {
         this.jotai = providerStore;
     }
 
-    setSession = (session) => {
-        this.jotai.set(accessTokenAtom, session.access_token);
-        this.jotai.set(refreshTokenAtom, session.refresh_token);
+    setSession = (tokens) => {
+        const session = this.jotai.get(sessionAtom);
+        this.jotai.set(sessionAtom, {
+            username: session.username,
+            password: session.password,
+            accessToken: tokens.access_token,
+            refreshToken: tokens.refresh_token
+        });
     }
 
     checkNetwork = async () => {
@@ -60,12 +65,12 @@ export default class Api {
 
     refresh = async () => {
         if(this.checkNetwork()) {
-            const refreshToken = await this.jotai.get(refreshTokenAtom);
-            if(refreshToken instanceof String) {
+            const session = await this.jotai.get(sessionAtom);
+            if(session.refreshToken instanceof String) {
                 axios.post(this.drupal.getBaseUrl() + '/oauth/token', {
                     grant_type: 'refresh_token',
                     client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
-                    refresh_token: refreshToken
+                    refresh_token: session.refreshToken
                 })
                 .then(async (response) => {
                     this.setSession(response.data);
@@ -74,8 +79,7 @@ export default class Api {
                 })
                 .catch((error) => {
                     this.jotai.set(needsRefreshAtom, false);
-                    this.jotai.set(refreshTokenAtom, null);
-                    this.jotai.set(accessTokenAtom, null);
+                    this.jotai.set(sessionAtom, null);
                     console.log('Api.refresh:', error);
                 });
             }
@@ -93,9 +97,9 @@ export default class Api {
 
     patchEntity = async (entityType, entityBundle, id, body) => {
         if(await this.checkNetwork()) {
-            let accessToken = await this.jotai.get(accessTokenAtom);
+            let session = await this.jotai.get(sessionAtom);
 
-            const options = this.getStandardHeaders(accessToken);
+            const options = this.getStandardHeaders(session.accessToken);
 
             const response = await axios.patch(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() + `${entityType}/${entityBundle}/${id}`, body, options);
 
@@ -108,9 +112,9 @@ export default class Api {
     getEntity = async (entityType, entityBundle, id, params = {}) => {
         if(await this.checkNetwork()) {
         
-            let accessToken = await this.jotai.get(accessTokenAtom);
+            let session = await this.jotai.get(sessionAtom);
 
-            const options = this.getStandardHeaders(accessToken);
+            const options = this.getStandardHeaders(session.accessToken);
 
             if(Object.keys(params) !== 0 && params.constructor === Object) {
                 this.addParametersAsOptions(options, params);
@@ -127,13 +131,15 @@ export default class Api {
     getEntities = async (entityType, entityBundle, params = {}) => {
         if(await this.checkNetwork()) {
 
-            let accessToken = await this.jotai.get(accessTokenAtom);
+            let session = await this.jotai.get(sessionAtom);
 
-            const options = this.getStandardHeaders(accessToken);
+            const options = this.getStandardHeaders(session.accessToken);
 
             if(Object.keys(params) !== 0 && params.constructor === Object) {
                 this.addParametersAsOptions(options, params);
             }
+
+            console.log(options);
 
             const response = await axios.get(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() + `${entityType}/${entityBundle}`, options);
 

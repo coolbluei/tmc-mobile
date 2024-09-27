@@ -1,7 +1,7 @@
 import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { Button, Image, KeyboardAvoidingView, Platform, Switch, Text, TextInput, View } from 'react-native';
-import { apiAtom, credentialsAtom, accessTokenAtom, preferencesAtom, refreshTokenAtom, biometricsEntrolledAtom, userDataAtom } from '../../storage/atoms';
+import { apiAtom, preferencesAtom, biometricsEntrolledAtom, biometricUsernameAtom, biometricPasswordAtom, sessionAtom } from '../../storage/atoms';
 import Styles from '../../styles';
 import * as LocalAuthentication from 'expo-local-authentication';
 
@@ -12,25 +12,25 @@ const LoginForm = () => {
     const [message, setMessage] = useState();
 
     const [api] = useAtom(apiAtom);
-    const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
-    const [refreshToken, setRefreshToken] = useAtom(refreshTokenAtom);
-    const [credentials, setCredentials] = useAtom(credentialsAtom);
+    const [biometricUsername, setBiometricUsername] = useAtom(biometricUsernameAtom);
+    const [biometricPassword, setBiometricPassword] = useAtom(biometricPasswordAtom);
     const [preferences, setPreferences] = useAtom(preferencesAtom);
     const [biometricsEnrolled] = useAtom(biometricsEntrolledAtom);
+    const [session, setSession] = useAtom(sessionAtom);
 
     let biometricsWidget = null;
 
     const login = async (usernameParameter = null, passwordParameter = null) => {
 
-        let username = usernameValue;
-        let password = passwordValue;
+        let usernameInput = usernameValue;
+        let passwordInput = passwordValue;
 
         if(usernameParameter && passwordParameter) {
-            username = usernameParameter;
-            password = passwordParameter;
+            usernameInput = usernameParameter;
+            passwordInput = passwordParameter;
         }
 
-        const response = await api.login(username, password);
+        const response = await api.login(usernameInput, passwordInput);
 
         if(response.type === 'error') {
             setMessage((
@@ -38,12 +38,14 @@ const LoginForm = () => {
             ));    
         } else {
             if(response.status === 200) {
-                setAccessToken(response.data.access_token);
-                setRefreshToken(response.data.refresh_token);
-                setCredentials({
-                    username: username,
-                    password: password
+                setSession({
+                    username: usernameInput,
+                    password: passwordInput,
+                    accessToken: response.data.access_token,
+                    refreshToken: response.data.refresh_token
                 });
+                setBiometricUsername(usernameInput);
+                setBiometricPassword(passwordInput);
             }
         }
     }
@@ -57,9 +59,9 @@ const LoginForm = () => {
         });
 
         if(result.success) {
-            setUsernameValue(credentials.username);
-            setPasswordValue(credentials.password);
-            login(credentials.username, credentials.password);
+            setUsernameValue(biometricUsername);
+            setPasswordValue(biometricPassword);
+            login(biometricUsername, biometricPassword);
             return true;
         }
 
@@ -81,7 +83,7 @@ const LoginForm = () => {
         }
 
         if(preferences.useBiometrics) {
-            if(credentials instanceof Object && credentials.hasOwnProperty('username')) {
+            if(session.username) {
                 biometricsWidget = <Button title={`Login with ${biometricsLabel}`} onPress={biometricLogin} />;
             }
         } else {
