@@ -74,8 +74,6 @@ const LoginForm = () => {
         });
     }
 
-    biometricsWidget = null;
-
     if(biometricsEnrolled) {
         let biometricsLabel = 'Biometrics';
         if(Platform.OS === 'ios') {
@@ -83,7 +81,7 @@ const LoginForm = () => {
         }
 
         if(preferences.useBiometrics) {
-            if(session.username) {
+            if(session?.username) {
                 biometricsWidget = <Button title={`Login with ${biometricsLabel}`} onPress={biometricLogin} />;
             }
         } else {
