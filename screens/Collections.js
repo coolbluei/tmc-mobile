@@ -6,7 +6,6 @@ import { isRefreshingAtom, userDataAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Collection from "../components/Collection";
 import Playlist from "../components/Playlist";
-import useUserData from "../drupal/useUserData";
 
 const Collections = () => {
 
@@ -15,11 +14,8 @@ const Collections = () => {
 
     const [items, setItems] = useState();
 
-    const getUserData = useUserData();
-
     const refresh = useCallback(() => {
         setIsRefreshing(true);
-        getUserData();
     }, []);
 
     useEffect(() => {

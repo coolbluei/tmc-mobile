@@ -1,4 +1,4 @@
-import { apiAtom, credentialsAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, userDataAtom, offlineAtom, isRefreshingAtom } from "../storage/atoms";
+import { apiAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, userDataAtom, offlineAtom, isRefreshingAtom, sessionAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
@@ -9,7 +9,7 @@ import OfflineCollections from "../screens/OfflineCollections";
 import Playlist from "../screens/Playlist";
 import Navbar from "./Navbar";
 import Styles from "../styles";
-import { ActivityIndicator, Button, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import Collection from "../screens/Collection";
 import Player from "./Player";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -25,7 +25,6 @@ const Stack = createNativeStackNavigator();
 const Controller = () => {
 
     const [api] = useAtom(apiAtom);
-    const [credentials] = useAtom(credentialsAtom);
     const [isAuthenticated] = useAtom(isAuthenticatedAtom);
     const [playlists] = useAtom(playlistAtom);
     const [playlistSync, setPlaylistSync] = useAtom(playlistSyncAtom);
@@ -33,6 +32,7 @@ const Controller = () => {
     const [userData] = useAtom(userDataAtom);
     const [offline] = useAtom(offlineAtom);
     const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
+    const [session] = useAtom(sessionAtom);
 
     const [isInitialized, setIsInitialized] = useState(false);
 
@@ -54,24 +54,36 @@ const Controller = () => {
 
         initializeSongsDirectory();
 
-        if(api && isAuthenticated && credentials.hasOwnProperty('username')) {
+        if(api && isAuthenticated && session) {
             setIsInitialized(true);
         }
-    }, [api, isAuthenticated, credentials]);
+    }, [api, isAuthenticated, session]);
 
     useEffect(() => {
         if(isAuthenticated && isInitialized && navigation.hasOwnProperty('navigate')) {
             if(offline) {
                 navigation.navigate('My Downloads');
             } else {
+                getUserData(false);
                 navigation.navigate('Home');
             }
         }
     }, [offline, isAuthenticated, isInitialized]);
 
     useEffect(() => {
+        if(session?.username.toLowerCase() !== userData?.data.name.toLowerCase()) {
+            setIsRefreshing(true);
+        }
+    }, [session]);
+
+    useEffect(() => {
+        if(isRefreshing) {
+            getUserData(true);
+        }
+    }, [isRefreshing]);
+
+    useEffect(() => {
         if(api && playlistSync && userData) {
-            console.log('Controller playlistSync')
             const currentTime = new Date().getTime();
 
             if(currentTime > lastPlaylistSync + (30 * 1000)) {
@@ -103,7 +115,7 @@ const Controller = () => {
                         setPlaylistSync(false);
                         setLastPlaylistSync(currentTime);
                         setIsRefreshing(true);
-                        getUserData();
+                        getUserData(true);
                     }
                 })
                 .catch((error) => {

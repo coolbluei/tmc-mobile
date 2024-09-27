@@ -5,7 +5,8 @@ import { atomWithStorage, createJSONStorage } from "jotai/utils";
 const storage = createJSONStorage(() => AsyncStorage);
 
 const apiAtom = atom();
-const credentialsAtom = atomWithStorage('credentials', {}, storage);
+const biometricUsernameAtom = atomWithStorage('biometricUsername', null, storage);
+const biometricPasswordAtom = atomWithStorage('biometricPassword', null, storage)
 const accessTokenAtom = atomWithStorage('accessToken', null, storage);
 const refreshTokenAtom = atomWithStorage('refreshToken', null, storage);
 const preferencesAtom = atomWithStorage('preferences', { useBiometrics: false }, storage);
@@ -13,6 +14,7 @@ const playlistAtom = atomWithStorage('playlists', { favorites: { id: 'favorites'
 const playlistSyncAtom = atomWithStorage('playlistsSync', false, storage);
 const lastPlaylistSyncAtom = atomWithStorage('lastPlaylistSync', 0, storage);
 const userDataAtom = atomWithStorage('userData', null, storage);
+const sessionAtom = atomWithStorage('session', null, storage);
 
 const needsRefreshAtom = atom(true);
 const isAuthenticatedAtom = atom(false);
@@ -26,7 +28,8 @@ const isRefreshingAtom = atom(false);
 
 export { 
     apiAtom,
-    credentialsAtom,
+    biometricUsernameAtom,
+    biometricPasswordAtom,
     accessTokenAtom,
     refreshTokenAtom,
     preferencesAtom,
@@ -42,5 +45,6 @@ export {
     biometricsEntrolledAtom,
     offlineAtom,
     debugModeAtom,
-    isRefreshingAtom
+    isRefreshingAtom,
+    sessionAtom,
 };

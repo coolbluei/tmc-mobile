@@ -1,5 +1,5 @@
 import { useAtom } from "jotai";
-import { accessTokenAtom, needsRefreshAtom, apiAtom, isAuthenticatedAtom, biometricsEntrolledAtom } from "../../storage/atoms";
+import { needsRefreshAtom, apiAtom, isAuthenticatedAtom, biometricsEntrolledAtom, sessionAtom } from "../../storage/atoms";
 import { useEffect, useState } from "react";
 import Controller from "../Controller";
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -7,11 +7,11 @@ import * as LocalAuthentication from 'expo-local-authentication';
 const AuthProvider = () => {
 
     const [api] = useAtom(apiAtom);
-    const [accessToken] = useAtom(accessTokenAtom);
     const [needsRefresh, setNeedsRefresh] = useAtom(needsRefreshAtom);
     const [isAuthenticated, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
     const [isInitialized, setIsInitialized] = useState(false);
     const [biometricsEntrolled, setBiometricsEnrolled] = useAtom(biometricsEntrolledAtom);
+    const [session] = useAtom(sessionAtom);
 
     useEffect(() => {
         const checkBiometricsEnrollment = async () => {
@@ -26,7 +26,7 @@ const AuthProvider = () => {
     useEffect(() => {
         let hasSession = false;
 
-        if(api && accessToken) {
+        if(api && session) {
             hasSession = true;
 
             if(needsRefresh || !isInitialized) {
@@ -51,7 +51,7 @@ const AuthProvider = () => {
 
         setIsAuthenticated(hasSession);
         
-    }, [needsRefresh, accessToken]);
+    }, [needsRefresh, session]);
 
     return (
         <Controller />

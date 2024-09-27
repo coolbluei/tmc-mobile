@@ -1,29 +1,25 @@
 import React, { useState } from 'react';
 import { Button, Platform, SafeAreaView, Switch, Text, View } from "react-native";
 import { useAtom } from "jotai";
-import { accessTokenAtom, apiAtom, biometricsEntrolledAtom, debugModeAtom, offlineAtom, preferencesAtom, refreshTokenAtom, userDataAtom } from "../storage/atoms";
+import { apiAtom, biometricsEntrolledAtom, debugModeAtom, offlineAtom, preferencesAtom, sessionAtom, userDataAtom } from "../storage/atoms";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
 import { useEffect } from "react";
-import useUserData from "../drupal/useUserData";
 
 const User = () => {
 
-    const [accessToken, setAccessToken] = useAtom(accessTokenAtom);
-    const [refreshToken, setRefreshToken] = useAtom(refreshTokenAtom);
     const [userData, setUserData] = useAtom(userDataAtom);
     const [api] = useAtom(apiAtom);
     const [preferences, setPreferences] = useAtom(preferencesAtom);
     const [biometricsEnrolled] = useAtom(biometricsEntrolledAtom);
     const [offline, setOffline] = useAtom(offlineAtom);
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
+    const [session, setSession] = useAtom(sessionAtom);
 
     const [name, setName] = useState();
 
-
     const logout = () => {
-        setAccessToken(null);
-        setRefreshToken(null);
+        setSession(null);
         setUserData(null);
     };
 
@@ -36,8 +32,10 @@ const User = () => {
     }
 
     useEffect(() => {
-        const user = new Entity(userData);
-        setName(user.get('display_name'));
+        if(userData && userData.hasOwnProperty('data')) {
+            const user = new Entity(userData);
+            setName(user.get('display_name'));
+        }
     }, []);
 
     const toggleDebugMode = () => {
