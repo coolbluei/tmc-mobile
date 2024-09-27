@@ -1,7 +1,7 @@
 import { Linking, Platform, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { userDataAtom, isRefreshingAtom } from "../storage/atoms";
+import { userDataAtom, isRefreshingAtom, needsDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
@@ -14,6 +14,7 @@ const Home = () => {
 
     const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
     const [userData] = useAtom(userDataAtom);
+    const [needsData, setNeedsData] = useAtom(needsDataAtom);
 
     const [centerMessage, setCenterMessage] = useState();
 
@@ -31,6 +32,8 @@ const Home = () => {
             if(message) {
                 setCenterMessage(<View style={Styles.highlight}><Text>{message}</Text></View>);
             }
+        } else {
+            setNeedsData(true);
         }
     }, [userData]);
 

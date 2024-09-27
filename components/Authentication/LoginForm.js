@@ -81,7 +81,7 @@ const LoginForm = () => {
         }
 
         if(preferences.useBiometrics) {
-            if(session?.username) {
+            if(biometricUsername) {
                 biometricsWidget = <Button title={`Login with ${biometricsLabel}`} onPress={biometricLogin} />;
             }
         } else {

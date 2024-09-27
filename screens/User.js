@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Platform, SafeAreaView, Switch, Text, View } from "react-native";
 import { useAtom } from "jotai";
-import { apiAtom, biometricsEntrolledAtom, debugModeAtom, offlineAtom, preferencesAtom, sessionAtom, userDataAtom } from "../storage/atoms";
+import { apiAtom, biometricsEntrolledAtom, debugModeAtom, needsDataAtom, offlineAtom, preferencesAtom, sessionAtom, userDataAtom } from "../storage/atoms";
 import Styles from "../styles";
 import Entity from "../drupal/Entity";
 import { useEffect } from "react";
@@ -15,6 +15,7 @@ const User = () => {
     const [offline, setOffline] = useAtom(offlineAtom);
     const [debugMode, setDebugMode] = useAtom(debugModeAtom);
     const [session, setSession] = useAtom(sessionAtom);
+    const [needsData, setNeedsData] = useAtom(needsDataAtom);
 
     const [name, setName] = useState();
 
@@ -35,6 +36,8 @@ const User = () => {
         if(userData && userData.hasOwnProperty('data')) {
             const user = new Entity(userData);
             setName(user.get('display_name'));
+        } else {
+            setNeedsData(true);
         }
     }, []);
 

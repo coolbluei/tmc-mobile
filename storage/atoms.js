@@ -22,9 +22,10 @@ const downloadsAtom = atom([]);
 const updateDownloadsAtom = atom(true);
 const downloadQueueAtom = atom([]);
 const biometricsEntrolledAtom = atom(false);
-const offlineAtom = atom(true);
+const offlineAtom = atom(false);
 const debugModeAtom = atom(false);
 const isRefreshingAtom = atom(false);
+const needsDataAtom = atom(true);
 
 export { 
     apiAtom,
@@ -47,4 +48,5 @@ export {
     debugModeAtom,
     isRefreshingAtom,
     sessionAtom,
+    needsDataAtom
 };
