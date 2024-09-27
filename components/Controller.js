@@ -71,7 +71,7 @@ const Controller = () => {
     }, [offline, isAuthenticated, isInitialized]);
 
     useEffect(() => {
-        if(session?.username.toLowerCase() !== userData?.data.name.toLowerCase()) {
+        if(session?.username?.toLowerCase() !== userData?.data?.name?.toLowerCase()) {
             setIsRefreshing(true);
         }
     }, [session]);

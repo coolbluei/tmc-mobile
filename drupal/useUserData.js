@@ -22,7 +22,6 @@ const useUserData = () => {
 
         // If it's not null...
         if(userData) {
-            console.log('we have userData');
             // If it's expired or we're manually refreshing...
             if(userData.expiration < currentTime || refresh) {
                 // Make a User Entity.
@@ -66,7 +65,6 @@ const useUserData = () => {
 
             api.getEntities('user', 'user', params)
             .then((response) => {
-                console.log(response.data);
                 if(response.status === 200 && !response.data.hasOwnProperty('meta')) {
                     const data = {
                         expiration: currentTime + (30 * 60 * 1000),
