@@ -139,8 +139,6 @@ export default class Api {
                 this.addParametersAsOptions(options, params);
             }
 
-            console.log(options);
-
             const response = await axios.get(this.drupal.getBaseUrl() + this.drupal.getJsonApiBase() + `${entityType}/${entityBundle}`, options);
 
             return response;
