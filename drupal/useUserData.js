@@ -11,12 +11,10 @@ const useUserData = () => {
     const [needsData, setNeedsData] = useAtom(needsDataAtom);
 
     const getData = (refresh) => {
-        console.log('getData');
         // Get whatever is stored in userData. Could be null, current, or expired.
         let result = userData;
 
         if(offline) {
-            console.log('offline');
             return result;
         }
 
@@ -24,10 +22,8 @@ const useUserData = () => {
 
         // If it's not null...
         if(userData) {
-            console.log('has userData');
             // If it's expired or we're manually refreshing...
             if(userData.expiration < currentTime || refresh) {
-                console.log('refreshing...');
                 // Make a User Entity.
                 const user = new Entity(userData);
 
@@ -41,7 +37,6 @@ const useUserData = () => {
                 // Make an api call to update the User Entity.
                 api.getEntity('user', 'user', user.get('id'), params)
                 .then((response) => {
-                    console.log('response:', response);
                     if(response.status === 200 && !response.data.hasOwnProperty('meta')) {
                         const data = {
                             expiration: currentTime + (30 * 60 * 1000),
@@ -57,12 +52,9 @@ const useUserData = () => {
                     console.log('useUserData:', error);
                 });
             }
-            console.log('done.')
         // If it is null...
         } else {
-            console.log('no userData');
             if(session) {
-                console.log('has session');
                 // Make an api call to get the user data by email address.
                 const params = {
                     'filter[email][path]': 'name',
@@ -74,7 +66,6 @@ const useUserData = () => {
 
                 api.getEntities('user', 'user', params)
                 .then((response) => {
-                    console.log('response: ', response);
                     if(response.status === 200 && !response.data.hasOwnProperty('meta')) {
                         const data = {
                             expiration: currentTime + (30 * 60 * 1000),
@@ -92,7 +83,6 @@ const useUserData = () => {
                     console.log('useUserData:', error);
                 });
             }
-            console.log('done');
         }
     };
 
