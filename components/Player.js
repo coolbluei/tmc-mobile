@@ -1,7 +1,7 @@
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { useAtom } from "jotai";
 import { tracksAtom, titleAtom, indexAtom, positionAtom, durationAtom, isPlayingAtom, playbackInstanceAtom, loopAtom, isReadyAtom } from '../storage/audioAtoms';
-import { downloadsAtom, offlineAtom } from "../storage/atoms";
+import { apiAtom, downloadsAtom, offlineAtom } from "../storage/atoms";
 import { useEffect, useState } from "react";
 import { View, Text, TouchableHighlight, ActivityIndicator } from "react-native";
 import Slider from "@react-native-community/slider";
@@ -23,9 +23,9 @@ const Player = () => {
     const [isReady, setIsReady] = useAtom(isReadyAtom);
     const [offline] = useAtom(offlineAtom);
     const [downloads] = useAtom(downloadsAtom);
+    const [api] = useAtom(apiAtom);
 
     const [advanceIndex, setAdvanceIndex] = useState(false);
-    const [playerOffline, setPlayerOffline] = useState(offline);
 
     // React to advanceIndex flag being updated.
     useEffect(() => {
@@ -64,66 +64,69 @@ const Player = () => {
         }
     }
 
-    // React to the index being updated
     useEffect(() => {
-        if(offline && !playerOffline) {
+        if(offline && playbackInstance instanceof Object) {
             playbackInstance.unloadAsync();
             setPlaybackInstance(null);
             setIsPlaying(false);
-            setIndex(null);
-            setPlayerOffline(true);
-            
-        } else {
+            setIndex(null)
+        }
+    }, [offline])
 
-            if(isReady) {
-                // Get the track object from the array of tracks for the current playlist.
-                const track = tracks[index];
+    // React to the index being updated
+    useEffect(() => {
+        if(!offline) {
+            api.checkNetwork();
+        }
 
-                // Creates a new playbackInstance for the current track and begins playing.
-                const beginPlayback = async () => {
+        if(isReady) {
+            // Get the track object from the array of tracks for the current playlist.
+            const track = tracks[index];
 
-                    // Create a source object
-                    let source = {
-                        uri: track.url
+            // Creates a new playbackInstance for the current track and begins playing.
+            const beginPlayback = async () => {
+
+                // Create a source object
+                let source = {
+                    uri: track.url
+                };
+
+                if(downloads.includes(track.id + '.mp3')) {
+                    source = {
+                        uri: FileSystem.documentDirectory + 'songs/' + track.id + '.mp3'
                     };
-
-                    if(downloads.includes(track.id + '.mp3')) {
-                        source = {
-                            uri: FileSystem.documentDirectory + 'songs/' + track.id + '.mp3'
-                        };
-                    }
-
-                    // If we have a playbackInstance, kill it because the index just changed.
-                    if(playbackInstance instanceof Object) {
-                        await playbackInstance.unloadAsync();
-                        await playbackInstance.loadAsync(source, { positionMillis: 0, shouldPlay: true });
-                    } else {
-                        await Audio.setAudioModeAsync({
-                            staysActiveInBackground: true,
-                            playsInSilentModeIOS: true,
-                            interruptionModeIOS: InterruptionModeIOS.DoNotMix,
-                            interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-                            shouldDuckAndroid: true,
-                            playThroughEarpieceAndroid: true
-                        });
-            
-                        // Create a new playbackInstance and pass in our onPlaybackStatusUpdate method to listen to status updates.
-                        const { sound, status } = await Audio.Sound.createAsync(source, { positionMillis: 0, shouldPlay: true }, onPlaybackStatusUpdate);
-            
-                        // Set the playbackInstance in state.
-                        await setPlaybackInstance(sound);
-                    }
                 }
 
-                // If the index is set...
-                if(typeof index === 'number') {
-                    // Set the title of the current track in state.
-                    setTitle(track.title);
-                    setPosition(0);
-
-                    // Create a new playbackInstance with the current track source.
-                    beginPlayback();
+                // If we have a playbackInstance, kill it because the index just changed.
+                if(playbackInstance instanceof Object) {
+                    await playbackInstance.unloadAsync();
+                    await playbackInstance.loadAsync(source, { positionMillis: 0, shouldPlay: true });
+                } else {
+                    await Audio.setAudioModeAsync({
+                        staysActiveInBackground: true,
+                        playsInSilentModeIOS: true,
+                        interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+                        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+                        shouldDuckAndroid: true,
+                        playThroughEarpieceAndroid: true
+                    });
+        
+                    // Create a new playbackInstance and pass in our onPlaybackStatusUpdate method to listen to status updates.
+                    const { sound, status } = await Audio.Sound.createAsync(source, { positionMillis: 0, shouldPlay: true }, onPlaybackStatusUpdate);
+        
+                    // Set the playbackInstance in state.
+                    await setPlaybackInstance(sound);
                 }
+            }
+
+            // If the index is set...
+            if(typeof index === 'number') {
+                // Set the title of the current track in state.
+                setTitle(track.title);
+                setPosition(0);
+
+                // Create a new playbackInstance with the current track source.
+                beginPlayback();
             }
         }
     }, [index]);
