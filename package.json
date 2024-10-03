@@ -30,7 +30,7 @@
     "expo-file-system": "^17.0.1",
     "expo-local-authentication": "~14.0.1",
     "expo-network": "^6.0.1",
-    "expo-notifications": "^0.28.9",
+    "expo-notifications": "^0.28.17",
     "expo-status-bar": "~1.12.1",
     "jotai": "^2.8.0",
     "qs": "^6.12.1",

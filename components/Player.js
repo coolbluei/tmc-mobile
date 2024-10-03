@@ -91,6 +91,8 @@ const Player = () => {
                     uri: track.url
                 };
 
+                console.log(downloads);
+
                 if(downloads.includes(track.id + '.mp3')) {
                     source = {
                         uri: FileSystem.documentDirectory + 'songs/' + track.id + '.mp3'

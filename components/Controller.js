@@ -1,4 +1,4 @@
-import { apiAtom, isAuthenticatedAtom, playlistSyncAtom, lastPlaylistSyncAtom, playlistAtom, userDataAtom, offlineAtom, isRefreshingAtom, sessionAtom, needsDataAtom } from "../storage/atoms";
+import { apiAtom, isAuthenticatedAtom, userDataAtom, offlineAtom, isRefreshingAtom, sessionAtom, needsDataAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import LoginForm from "./Authentication/LoginForm";
 import Home from "../screens/Home";
@@ -26,9 +26,6 @@ const Controller = () => {
 
     const [api] = useAtom(apiAtom);
     const [isAuthenticated] = useAtom(isAuthenticatedAtom);
-    const [playlists] = useAtom(playlistAtom);
-    const [playlistSync, setPlaylistSync] = useAtom(playlistSyncAtom);
-    const [lastPlaylistSync, setLastPlaylistSync] = useAtom(lastPlaylistSyncAtom);
     const [userData] = useAtom(userDataAtom);
     const [offline] = useAtom(offlineAtom);
     const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
@@ -88,49 +85,6 @@ const Controller = () => {
             getUserData(true);
         }
     }, [isRefreshing]);
-
-    useEffect(() => {
-        if(api && playlistSync && userData) {
-            const currentTime = new Date().getTime();
-
-            if(currentTime > lastPlaylistSync + (30 * 1000)) {
-            
-                const user = new Entity(userData);
-
-                const songs = playlists.favorites.songs.map((songId) => {
-                    return {
-                        type: "node--song",
-                        id: songId
-                    };
-                });
-
-                const body = {
-                    data: {
-                        type: "user--user",
-                        id: user.get('id'),
-                        relationships: {
-                            field_favorites: {
-                                data: songs
-                            }
-                        }
-                    }
-                };
-        
-                api.patchEntity('user', 'user', user.get('id'), body)
-                .then((response) => {
-                    if(response.status === 200) {
-                        setPlaylistSync(false);
-                        setLastPlaylistSync(currentTime);
-                        setIsRefreshing(true);
-                        getUserData(true);
-                    }
-                })
-                .catch((error) => {
-                    console.log('Controller.patchUser:', error);
-                });
-            }
-        }
-    }, [api, playlistSync]);
 
     let content = <LoginForm />;
 

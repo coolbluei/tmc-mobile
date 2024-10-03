@@ -54,8 +54,6 @@ const Collection = (props) => {
 
             const collections = user.get('field_application_access');
 
-            const favorites = user.get('field_favorites');
-
             const collection = collections.find((element) => element.get('id') === props.route.params.collectionId);
 
             // Initialize a list of songs.
@@ -86,15 +84,9 @@ const Collection = (props) => {
 
                 // Map each song to a Song component for display.
                 const content = songs.map((song, i) => {
-                    // Determine if the song is a favorite.
-                    let isFavorite = false;
-                    if(favorites instanceof Array && favorites.find((e) => e.get('id') === song.get('id'))) {
-                        isFavorite = true;
-                    }
-
                     // Create the Song component for each song.
                     return (
-                        <Song key={song.get('id')} data={song} trackIndex={i} isFavorite={isFavorite} tracks={trackItems} />
+                        <Song key={song.get('id')} data={trackItems[i]} trackIndex={i} tracks={trackItems} />
                     );
                 });
 

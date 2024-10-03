@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { isRefreshingAtom, needsDataAtom, userDataAtom } from "../storage/atoms";
+import { favoritesAtom, isRefreshingAtom, needsDataAtom, userDataAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Collection from "../components/Collection";
 import Playlist from "../components/Playlist";
@@ -12,6 +12,7 @@ const Collections = () => {
     const [userData] = useAtom(userDataAtom);
     const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
     const [needsData, setNeedsData] = useAtom(needsDataAtom);
+    const [favorites] = useAtom(favoritesAtom);
 
     const [items, setItems] = useState();
 
@@ -36,9 +37,7 @@ const Collections = () => {
                     );
                 });
 
-                const favorites = user.get('field_favorites');
-
-                if(favorites instanceof Object && favorites.length > 0) {
+                if(favorites instanceof Array && favorites.length > 0) {
                     content.unshift(<Playlist key="favorites" title="Favorites" playlistId="favorites" imageUrl={require('../assets/favorites-icon.jpg')} />);
                 }
 
@@ -48,7 +47,7 @@ const Collections = () => {
         } else {
             setNeedsData(true);
         }
-    }, [userData]);
+    }, [userData, favorites]);
 
     let collectionDataContent = (
         <View style={Styles.appWrapper}>
