@@ -54,7 +54,13 @@ const Player = () => {
             setDuration(status.durationMillis);
             setIsReady(!status.isBuffering);
         } else {
-            setIsReady(false);
+            if(playbackInstance) {
+                playbackInstance.unloadAsync();
+                setPlaybackInstance(null);
+                setIsPlaying(false);
+                setIndex(null);
+                setIsReady(false);
+            }
         }
 
         // When a track finishes playing...
@@ -71,7 +77,7 @@ const Player = () => {
             setIsPlaying(false);
             setIndex(null)
         }
-    }, [offline])
+    }, [offline]);
 
     // React to the index being updated
     useEffect(() => {
@@ -90,8 +96,6 @@ const Player = () => {
                 let source = {
                     uri: track.url
                 };
-
-                console.log(downloads);
 
                 if(downloads.includes(track.id + '.mp3')) {
                     source = {
