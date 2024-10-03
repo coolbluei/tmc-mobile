@@ -2,15 +2,15 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { userDataAtom, isRefreshingAtom } from "../storage/atoms";
+import { favoritesAtom, userDataAtom, isRefreshingAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Song from "../components/Song";
-import useUserData from "../drupal/useUserData";
 
-const Playlist = (props) => {
+const Playlist = () => {
 
     const [userData] = useAtom(userDataAtom);
     const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
+    const [favorites] = useAtom(favoritesAtom);
 
     const [items, setItems] = useState();
     const [title, setTitle] = useState();
@@ -23,31 +23,23 @@ const Playlist = (props) => {
         if(userData instanceof Object && userData.hasOwnProperty('data')) {
             const user = new Entity(userData);
 
-            let songs = user.get('field_favorites');
-
             setTitle('Favorites');
 
-            if(songs instanceof Array && songs.length > 0) {
-                const trackItems = songs.map((song) => {
-                    return {
-                        title: song.get('title'),
-                        artist: "Favorites",
-                        artwork: song.get('field_image')?.get('uri')?.url,
-                        url: song.get('field_full_song').get('uri')?.url,
-                        id: song.get('id'),
-                    };
+            if(favorites instanceof Array && favorites.length > 0) {
+                const trackItems = favorites.map((song) => {
+                    return song;
                 });
 
-                const content = songs.map((song, i) => {
+                const content = favorites.map((song, i) => {
                     return (
-                        <Song key={song.get('id')} data={song} trackIndex={i} isFavorite={true} tracks={trackItems} />
+                        <Song key={song.id} data={song} trackIndex={i} isFavorite={true} tracks={trackItems} />
                     );
                 });
 
                 setItems(content);
             }
         }
-    }, [userData]);
+    }, [favorites]);
 
     let songDataContent = null;
 

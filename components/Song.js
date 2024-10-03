@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import Styles from "../styles";
-import { downloadsAtom, playlistAtom, playlistSyncAtom, updateDownloadsAtom } from "../storage/atoms";
+import { downloadsAtom, favoritesAtom, updateDownloadsAtom } from "../storage/atoms";
 import { useAtom } from "jotai";
 import { indexAtom, tracksAtom } from "../storage/audioAtoms";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
@@ -14,8 +14,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 const Song = (props) => {
     const [index, setIndex] = useAtom(indexAtom);
     const [tracks, setTracks] = useAtom(tracksAtom);
-    const [playlists, setPlaylists] = useAtom(playlistAtom);
-    const [playlistSync, setPlaylistSync] = useAtom(playlistSyncAtom);
+    const [favorites, setFavorites] = useAtom(favoritesAtom);
     const [downloads] = useAtom(downloadsAtom);
     const [updateDownloads, setUpdateDownloads] = useAtom(updateDownloadsAtom);
 
@@ -43,7 +42,7 @@ const Song = (props) => {
                     await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'songs/');
                 }
 
-                const { uri } = await FileSystem.createDownloadResumable(props.data.get('field_full_song').get('uri').url, FileSystem.documentDirectory + 'songs/' + props.data.get('id') + '.mp3', {}, updateDownloadProgress).downloadAsync();
+                const { uri } = await FileSystem.createDownloadResumable(props.data.url, FileSystem.documentDirectory + 'songs/' + props.data.id + '.mp3', {}, updateDownloadProgress).downloadAsync();
 
                 setUpdateDownloads(true);
             } catch (e) {
@@ -52,23 +51,27 @@ const Song = (props) => {
         }
     };
 
+    useEffect(() => {
+        if(favorites.find((song) => song.id === props.data.id)) {
+            setIsFavorite(true);
+        }
+    }, [])
+
     const toggleFavorite = () => {
         // Copy state variables.
-        let lists = {...playlists};
+        let updatedFavorites = [...favorites];
 
         if(isFavorite) {
             // Remove from favorites.
-            const i = lists.favorites.songs.indexOf(props.data.get('id'));
+            const i = updatedFavorites.findIndex((track) => track.id === props.data.id);
 
             if(i >= 0) {
-                lists.favorites.songs.splice(i, 1);
+                updatedFavorites.splice(i, 1);
             }
         } else {
-            // Add to favorites.
-            lists.favorites.songs.push(props.data.get('id'));
+            updatedFavorites.push(props.data);
         }
-        setPlaylists(lists);
-        setPlaylistSync(true);
+        setFavorites(updatedFavorites);
         setIsFavorite(!isFavorite);
     };
 
@@ -78,7 +81,7 @@ const Song = (props) => {
     }
 
     const deleteSong = async () => {
-        await FileSystem.deleteAsync(FileSystem.documentDirectory + 'songs/' + props.data.get('id') + '.mp3');
+        await FileSystem.deleteAsync(FileSystem.documentDirectory + 'songs/' + props.data.id + '.mp3');
         setUpdateDownloads(true);
         setIsDownloading(false);
     };
@@ -104,9 +107,9 @@ const Song = (props) => {
 
     let content = (
         <View style={Styles.listItemContent}>
-            <Image style={Styles.listItemImage} src={props.data.get('field_image')?.get('uri')?.url} />
+            <Image style={Styles.listItemImage} src={props.data.artwork} />
 
-            <Text style={[Styles.title, Styles.listTitle]}>{props.data.get('title')}</Text>
+            <Text style={[Styles.title, Styles.listTitle]}>{props.data.title}</Text>
 
             {downloadButton}
 
@@ -116,7 +119,7 @@ const Song = (props) => {
         </View>
     );
 
-    if(downloads.includes(props.data.get('id') + '.mp3')) {
+    if(downloads.includes(props.data.id + '.mp3')) {
         downloadButton = (
             <FontAwesomeIcon size={24} icon={faSquareCheck} style={Styles.downloaded} />
         );
@@ -125,9 +128,9 @@ const Song = (props) => {
             <GestureHandlerRootView>
                 <Swipeable renderRightActions={deleteButton}>
                     <View style={Styles.listItemContent}>
-                        <Image style={Styles.listItemImage} src={props.data.get('field_image')?.get('uri')?.url} />
+                        <Image style={Styles.listItemImage} src={props.data.artwork} />
 
-                        <Text style={[Styles.title, Styles.listTitle]}>{props.data.get('title')}</Text>
+                        <Text style={[Styles.title, Styles.listTitle]}>{props.data.title}</Text>
 
                         {downloadButton}
 

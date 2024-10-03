@@ -1,4 +1,4 @@
-import { Linking, Platform, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { Linking, Platform, SafeAreaView, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { userDataAtom, isRefreshingAtom, needsDataAtom } from "../storage/atoms";
@@ -37,13 +37,11 @@ const Home = () => {
         }
     }, [userData]);
 
-    const refreshControl = <RefreshControl refreshing={isRefreshing} onRefresh={refresh} />;
-
     return (
         <SafeAreaView style={Styles.container}>
-            <ScrollView contentContainerStyle={[Styles.scroll, { flexShrink: 10 }]} refreshControl={refreshControl}>
+            <View>
                 {centerMessage}
-            </ScrollView>
+            </View>
 
             <WebView 
                 ref={webViewRef}
