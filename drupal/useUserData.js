@@ -12,6 +12,7 @@ const useUserData = () => {
 
     const getData = (refresh) => {
         // Get whatever is stored in userData. Could be null, current, or expired.
+        console.log('getData')
         let result = userData;
 
         if(offline) {

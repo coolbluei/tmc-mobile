@@ -1,6 +1,6 @@
 import axios from 'axios';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
-import { needsRefreshAtom, offlineAtom, sessionAtom } from '../storage/atoms';
+import { offlineAtom, sessionAtom } from '../storage/atoms';
 import QueryString from 'qs';
 import * as Network from 'expo-network';
 
@@ -63,22 +63,23 @@ export default class Api {
         return result;
     }
 
-    refresh = async () => {
+    refresh = async (failedRequest = null) => {
         if(this.checkNetwork()) {
             const session = await this.jotai.get(sessionAtom);
-            if(session.refreshToken instanceof String) {
+            if(session.refreshToken) {
                 axios.post(this.drupal.getBaseUrl() + '/oauth/token', {
                     grant_type: 'refresh_token',
                     client_id: process.env.EXPO_PUBLIC_CLIENT_ID,
                     refresh_token: session.refreshToken
                 })
                 .then(async (response) => {
+                    if(failedRequest) {
+                        failedRequest.response.config.headers['Authorization'] = `Bearer ${response.data.access_token}`;
+                    }
                     this.setSession(response.data);
-                    await this.jotai.set(needsRefreshAtom, false);
-                    return response.data.access_token;
+                    return Promise.resolve();
                 })
                 .catch((error) => {
-                    this.jotai.set(needsRefreshAtom, false);
                     this.jotai.set(sessionAtom, null);
                     console.log('Api.refresh:', error);
                 });

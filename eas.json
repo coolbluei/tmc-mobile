@@ -11,6 +11,7 @@
         "EXPO_PUBLIC_CLIENT_ID": "698b1139-5f19-4b86-ba94-c609d4cac6bf"
       },
       "ios": {
+        "simulator": true,
         "resourceClass": "m-medium"
       }
     },
