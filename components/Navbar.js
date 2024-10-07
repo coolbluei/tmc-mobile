@@ -4,11 +4,10 @@ import { faHome, faCog, faMusic, faWifi, faUser } from "@fortawesome/pro-solid-s
 import Styles from "../styles";
 import { useNavigation } from "@react-navigation/native";
 import { useAtom } from "jotai";
-import { apiAtom, offlineAtom, refreshTokenAtom } from "../storage/atoms";
+import { apiAtom, offlineAtom } from "../storage/atoms";
 
 const Navbar = () => {
 
-    const [refreshToken] = useAtom(refreshTokenAtom);
     const [api] = useAtom(apiAtom);
     const [offline] = useAtom(offlineAtom);
 
@@ -33,7 +32,7 @@ const Navbar = () => {
                     <FontAwesomeIcon icon={faMusic} size={24} style={Styles.navbarItem} />
                 </TouchableOpacity>
     
-                <TouchableOpacity onPress={() => Linking.openURL(`https://themusicclass.com/app/user/home?token=${refreshToken}`)}>
+                <TouchableOpacity onPress={() => Linking.openURL(`https://themusicclass.com/app/user/home`)}>
                     <FontAwesomeIcon icon={faCog} size={24} style={Styles.navbarItem} />
                 </TouchableOpacity>
     

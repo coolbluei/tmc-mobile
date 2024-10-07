@@ -7,7 +7,6 @@ import * as LocalAuthentication from 'expo-local-authentication';
 const AuthProvider = () => {
 
     const [api] = useAtom(apiAtom);
-    const [needsRefresh, setNeedsRefresh] = useAtom(needsRefreshAtom);
     const [isAuthenticated, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
     const [isInitialized, setIsInitialized] = useState(false);
     const [biometricsEntrolled, setBiometricsEnrolled] = useAtom(biometricsEntrolledAtom);
@@ -29,12 +28,11 @@ const AuthProvider = () => {
         if(api && session) {
             hasSession = true;
 
-            if(needsRefresh || !isInitialized) {
+            if(!isInitialized) {
                 const refresh = async () => {
                     api.refresh()
                     .then((response) => {
                         if(response instanceof Object) {
-                            setNeedsRefresh(false);
                             hasSession = true;
                         }
                     })
@@ -51,7 +49,7 @@ const AuthProvider = () => {
 
         setIsAuthenticated(hasSession);
         
-    }, [needsRefresh, session]);
+    }, [session]);
 
     return (
         <Controller />
