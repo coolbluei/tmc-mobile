@@ -1,14 +1,12 @@
-import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from "expo-av";
 import { useAtom } from "jotai";
-import { tracksAtom, titleAtom, indexAtom, positionAtom, durationAtom, isPlayingAtom, playbackInstanceAtom, loopAtom, isReadyAtom } from '../storage/audioAtoms';
-import { apiAtom, downloadsAtom, offlineAtom } from "../storage/atoms";
+import { tracksAtom, indexAtom, loopAtom } from '../storage/audioAtoms';
+import { offlineAtom } from "../storage/atoms";
 import { useEffect, useState } from "react";
 import { View, Text, TouchableHighlight, ActivityIndicator } from "react-native";
 import Slider from "@react-native-community/slider";
 import Styles from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBackward, faForward, faPause, faPlay, faRotateLeft } from "@fortawesome/pro-solid-svg-icons";
-import * as FileSystem from 'expo-file-system';
 import TrackPlayer, { Capability, Event, RepeatMode, State, usePlaybackState, useProgress, useTrackPlayerEvents } from 'react-native-track-player';
 
 const Player = () => {
@@ -44,7 +42,6 @@ const Player = () => {
     };
 
     const beginPlayback = async () => {
-        TrackPlayer.reset();
         if(tracks.length > 0) {
             try {
                 await TrackPlayer.add(tracks);
@@ -66,7 +63,7 @@ const Player = () => {
         const trackIndex = await TrackPlayer.getActiveTrackIndex();
         const trackObject = await TrackPlayer.getActiveTrack();
         setIndex(trackIndex);
-        setTitle(trackObject.title);
+        setTitle(trackObject?.title);
     };
     
     const togglePlay = async playBackState => {
@@ -143,7 +140,7 @@ const Player = () => {
 
     let content = null;
 
-    if(typeof playerState.state === 'string' && playerState.state !== State.None && playerState !== State.Stopped) {
+    if(typeof playerState.state === 'string' && playerState.state !== State.None && playerState.state !== State.Stopped) {
         let displayTitle = <ActivityIndicator size="small" color="#000000" />
 
         if(isReady) {

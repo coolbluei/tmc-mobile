@@ -13,7 +13,6 @@ import { ActivityIndicator, View } from "react-native";
 import Collection from "../screens/Collection";
 import Player from "./Player";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Entity from "../drupal/Entity";
 import DownloadManager from "./DownloadManager";
 import { useNavigation } from "@react-navigation/native";
 import * as FileSystem from 'expo-file-system';
