@@ -30,7 +30,7 @@ const useUserData = () => {
                 // Set up some query params.
                 const params = {
                     'include': 'field_application_access,field_application_access.field_image,field_application_access.field_songs,field_application_access.field_songs.field_image,field_application_access.field_songs.field_full_song,field_favorites,field_favorites.field_image,field_favorites',
-                    'fields[user--user]': 'id,name,field_application_access,display_name,center_message,field_favorites',
+                    'fields[user--user]': 'id,name,field_application_access,display_name,center_message,field_favorites,dashboard_link',
                     'fields[node--song]': 'id,title,field_full_song,field_image'
                 };
 
