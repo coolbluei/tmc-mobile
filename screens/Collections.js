@@ -17,7 +17,6 @@ const Collections = () => {
     const [items, setItems] = useState();
 
     const refresh = useCallback(() => {
-        console.log('refreshing...')
         setIsRefreshing(true);
     }, []);
 

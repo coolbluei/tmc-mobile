@@ -9,211 +9,149 @@ import Styles from "../styles";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faBackward, faForward, faPause, faPlay, faRotateLeft } from "@fortawesome/pro-solid-svg-icons";
 import * as FileSystem from 'expo-file-system';
+import TrackPlayer, { Capability, Event, RepeatMode, State, usePlaybackState, useProgress, useTrackPlayerEvents } from 'react-native-track-player';
 
 const Player = () => {
 
     const [tracks] = useAtom(tracksAtom);
-    const [title, setTitle] = useAtom(titleAtom);
-    const [playbackInstance, setPlaybackInstance] = useAtom(playbackInstanceAtom);
-    const [index, setIndex] = useAtom(indexAtom);
-    const [duration, setDuration] = useAtom(durationAtom);
-    const [position, setPosition] = useAtom(positionAtom);
-    const [isPlaying, setIsPlaying] = useAtom(isPlayingAtom);
     const [loop, setLoop] = useAtom(loopAtom);
-    const [isReady, setIsReady] = useAtom(isReadyAtom);
+    const [index, setIndex] = useAtom(indexAtom);
     const [offline] = useAtom(offlineAtom);
-    const [downloads] = useAtom(downloadsAtom);
-    const [api] = useAtom(apiAtom);
 
-    const [advanceIndex, setAdvanceIndex] = useState(false);
+    const [title, setTitle] = useState();
 
-    // React to advanceIndex flag being updated.
-    useEffect(() => {
-        // If advanceIndex is true...
-        if(advanceIndex) {
-            // If this is not the last track in the playlist...
-            if(index + 1 < tracks.length) {
-                // Go to the next track.
-                setIndex(index + 1);
-            } else if(loop) {
-                // Otherwise, if we're looping...go to the first track.
-                setIndex(0);
-            }
+    const progress = useProgress();
 
-            // Set the advanceIndex flag back to false.
-            setAdvanceIndex(false);
+    const playerState = usePlaybackState();
+    const isReady = playerState.state === State.Ready || playerState.state === State.Playing || playerState.state === State.Paused;
+    const isPlaying = playerState.state === State.Playing;
+
+    const setupPlayer = async () => {
+        try {
+            await TrackPlayer.setupPlayer();
+            await TrackPlayer.updateOptions({
+                capabilities: [
+                    Capability.Play,
+                    Capability.Pause,
+                    Capability.SkipToNext,
+                    Capability.SkipToPrevious
+                ],
+            });
+            TrackPlayer.setPlayWhenReady(true);
+        } catch (error) { 
+            console.log(error);
         }
-    }, [advanceIndex]);
+    };
 
-    // Callback to handle playback status updates from the playbackInstance
-    const onPlaybackStatusUpdate = (status) => {
-        // Update the player state with each update
-        if(status.isLoaded) {
-            setPosition(status.positionMillis);
-            setIsPlaying(status.isPlaying);
-            setDuration(status.durationMillis);
-            setIsReady(!status.isBuffering);
+    const beginPlayback = async () => {
+        TrackPlayer.reset();
+        if(tracks.length > 0) {
+            try {
+                await TrackPlayer.add(tracks);
+                await TrackPlayer.play();
+            } catch (error) { 
+                console.log(error); 
+            }
+        }
+    };
+    
+    useTrackPlayerEvents([Event.PlaybackActiveTrackChanged], async (event) => {
+        if (event.type === Event.PlaybackActiveTrackChanged) {
+            gettrackdata();
+            TrackPlayer.play();
+        }
+    });
+    
+    const gettrackdata = async () => {
+        const trackIndex = await TrackPlayer.getActiveTrackIndex();
+        const trackObject = await TrackPlayer.getActiveTrack();
+        setIndex(trackIndex);
+        setTitle(trackObject.title);
+    };
+    
+    const togglePlay = async playBackState => {
+        if ((playerState.state === State.Paused) || (playerState.state === State.Ready)) {
+            await TrackPlayer.play();
         } else {
-            if(playbackInstance) {
-                playbackInstance.unloadAsync();
-                setPlaybackInstance(null);
-                setIsPlaying(false);
-                setIndex(null);
-                setIsReady(false);
-            }
+            await TrackPlayer.pause();
         }
+    };
+    
+    const next = async () => {
+        await TrackPlayer.skipToNext();
+        TrackPlayer.play();
+        gettrackdata();
+    };
 
-        // When a track finishes playing...
-        if(status.didJustFinish) {
-            // Set the advanceIndex flag to true so that the useEffect will fire.
-            setAdvanceIndex(true);
+    const rewindOrPrev = async () => {
+        if(tracks.length > 0) {
+            await TrackPlayer.skipToPrevious();
+            TrackPlayer.play();
+            gettrackdata();
         }
-    }
+    };
 
-    useEffect(() => {
-        if(offline && playbackInstance instanceof Object) {
-            playbackInstance.unloadAsync();
-            setPlaybackInstance(null);
-            setIsPlaying(false);
-            setIndex(null)
-        }
-    }, [offline]);
+    const seek = async (value) => {
+        // If the value is in range (probably unnecessary to check)...
+        if(value >= 0 && value <= 1) {
+            /* Multiply the value from the slider (a float between 0 and 1) by the duration of the 
+               track as a percentage. The position value is always in seconds. Round down to 
+               avoid out of range error (probably unnecessary). */
+            const seconds = Math.floor(progress.duration * value);
 
-    // React to the index being updated
-    useEffect(() => {
-        if(!offline) {
-            api.checkNetwork();
-        }
-
-        if(isReady) {
-            // Get the track object from the array of tracks for the current playlist.
-            const track = tracks[index];
-
-            // Creates a new playbackInstance for the current track and begins playing.
-            const beginPlayback = async () => {
-
-                // Create a source object
-                let source = {
-                    uri: track.url
-                };
-
-                if(downloads.includes(track.id + '.mp3')) {
-                    source = {
-                        uri: FileSystem.documentDirectory + 'songs/' + track.id + '.mp3'
-                    };
-                }
-
-                // If we have a playbackInstance, kill it because the index just changed.
-                if(playbackInstance instanceof Object) {
-                    await playbackInstance.unloadAsync();
-                    await playbackInstance.loadAsync(source, { positionMillis: 0, shouldPlay: true });
-                } else {
-                    await Audio.setAudioModeAsync({
-                        staysActiveInBackground: true,
-                        playsInSilentModeIOS: true,
-                        interruptionModeIOS: InterruptionModeIOS.DoNotMix,
-                        interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-                        shouldDuckAndroid: true,
-                        playThroughEarpieceAndroid: true
-                    });
-        
-                    // Create a new playbackInstance and pass in our onPlaybackStatusUpdate method to listen to status updates.
-                    const { sound, status } = await Audio.Sound.createAsync(source, { positionMillis: 0, shouldPlay: true }, onPlaybackStatusUpdate);
-        
-                    // Set the playbackInstance in state.
-                    await setPlaybackInstance(sound);
-                }
-            }
-
-            // If the index is set...
-            if(typeof index === 'number') {
-                // Set the title of the current track in state.
-                setTitle(track.title);
-                setPosition(0);
-
-                // Create a new playbackInstance with the current track source.
-                beginPlayback();
-            }
-        }
-    }, [index]);
-
-    // React to the playbackInstance being loaded.
-    useEffect(() => {
-        if(playbackInstance instanceof Object) {
-            playbackInstance.playAsync();
-        }
-
-        // This is the cleanup function for this component. If the Player unmounts, stop the sound.
-        return playbackInstance ? () => { playbackInstance.unloadAsync(); setPlaybackInstance(null); setIsPlaying(false); setIndex(null) } : undefined;
-    }, [playbackInstance]);
-
-    // React to play/pause button press.
-    const togglePlay = () => {
-        if(isReady) {
-            if(isPlaying) {
-                playbackInstance.pauseAsync();
-            } else {
-                playbackInstance.playAsync();
-            }
+            // Set the playbackInstance position to the seek position.
+            TrackPlayer.seekTo(seconds);
         }
     };
 
     const toggleLoop = () => {
         setLoop(!loop);
     }
+      
+    useEffect(() => {
+        setupPlayer();
+    }, []);
 
-    // React to previous button press. 
-    const rewindOrPrev = () => {
-        if(isReady) {
-            // If the position is more than 500 milliseconds...
-            if(position > 500) {
-                // Go back to the beginning of the track.
-                playbackInstance.setPositionAsync(0);
-            } else {
-                // Otherwise, if there is an earlier song in the playlist...
-                if(index > 0) {
-                    // Go to the previous song.
-                    setIndex(index - 1);
-                }
-            }
+    useEffect(() => {
+        beginPlayback();
+    }, [tracks]);
+
+    useEffect(() => {
+        if(typeof index === 'number') {
+            TrackPlayer.skip(index);
+            TrackPlayer.play();
         }
-    };
+    }, [index]);
 
-    // React to next button press.
-    const next = () => {
-        if(isReady) {
-            // Set the advanceIndex flat to true so the useEffect will fire.
-            setAdvanceIndex(true);
+    useEffect(() => {
+        let repeatMode = RepeatMode.Off;
+
+        if(loop) {
+            repeatMode = RepeatMode.Queue;
         }
-    };
 
-    // React to seek slider changes.
-    const seek = (value) => {
-        // If the value is in range (probably unnecessary to check)...
-        if(value >= 0 && value <= 1) {
-            /* Multiply the value from the slider (a float between 0 and 1) by the duration of the 
-               track as a percentage. The position value is always in milliseconds. Round down to 
-               avoid out of range error (probably unnecessary). */
-            const milliseconds = Math.floor(duration * value);
+        TrackPlayer.setRepeatMode(repeatMode);
+    }, [loop]);
 
-            // Set the playbackInstance position to the seek position.
-            playbackInstance.setPositionAsync(milliseconds);
+    useEffect(() => {
+        if(offline) {
+            TrackPlayer.reset();
         }
-    }
+    }, [offline]);
 
     let playPauseButton = <FontAwesomeIcon icon={faPlay} size={24} />;
 
-    if(isPlaying) {
-        playPauseButton = <FontAwesomeIcon icon={faPause} size={24} />;
-    }
-
     let content = null;
 
-    if(isPlaying || typeof index === 'number') {
+    if(typeof playerState.state === 'string' && playerState.state !== State.None && playerState !== State.Stopped) {
         let displayTitle = <ActivityIndicator size="small" color="#000000" />
 
         if(isReady) {
             displayTitle = <Text style={Styles.playerTitle}>{title}</Text>;
+        }
+
+        if(isPlaying) {
+            playPauseButton = <FontAwesomeIcon icon={faPause} size={24} />;
         }
 
         let loopStyle = Styles.inactive;
@@ -225,7 +163,7 @@ const Player = () => {
         content = (
             <View style={Styles.player}>
                 <View style={Styles.alignCenter}>{displayTitle}</View>
-                <Slider style={{ width: '100%' }} value={position / duration} onSlidingComplete={seek} />
+                <Slider style={{ width: '100%' }} value={progress.position / progress.duration} onSlidingComplete={seek} />
                 <View style={Styles.alignCenter}>
                     <View style={Styles.playerControls}>
                         <TouchableHighlight onPress={rewindOrPrev}><FontAwesomeIcon icon={faBackward} size={24} /></TouchableHighlight>

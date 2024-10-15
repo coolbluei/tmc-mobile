@@ -5,6 +5,7 @@ import { useAtom } from "jotai";
 import { userDataAtom, downloadsAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import OfflineSong from "../components/OfflineSong";
+import * as FileSystem from 'expo-file-system';
 
 const OfflineCollection = (props) => {
 
@@ -35,7 +36,7 @@ const OfflineCollection = (props) => {
                                 title: song.get('title'),
                                 artist: collection.get('title'),
                                 artwork: song.get('field_image')?.get('uri')?.url,
-                                url: song.get('field_full_song').get('uri').url,
+                                url: FileSystem.documentDirectory + 'songs/' + song.get('id') + '.mp3',
                                 id: song.get('id'),
                             });
                         }

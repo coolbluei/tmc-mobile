@@ -2,17 +2,19 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, SafeAreaView, ScrollView, Text } from "react-native";
 import Styles from "../styles";
 import { useAtom } from "jotai";
-import { userDataAtom, isRefreshingAtom } from "../storage/atoms";
+import { userDataAtom, isRefreshingAtom, downloadsAtom } from "../storage/atoms";
 import Entity from "../drupal/Entity";
 import Include from "../drupal/Include";
 import Song from "../components/Song";
 import { useFocusEffect } from "@react-navigation/native";
+import * as FileSystem from 'expo-file-system';
 
 const Collection = (props) => {
 
     const [title, setTitle] = useState();
     const [userData] = useAtom(userDataAtom);
     const [isRefreshing, setIsRefreshing] = useAtom(isRefreshingAtom);
+    const [downloads] = useAtom(downloadsAtom);
 
     const [items, setItems] = useState();
 
@@ -72,12 +74,17 @@ const Collection = (props) => {
             if(songs instanceof Array && songs.length > 0) {
                 // Map each song to a trackItem object that the Player can handle.
                 const trackItems = songs.map((song) => {
+                    let source = song.get('field_full_song').get('uri')?.url;
+
+                    if(downloads.includes(song.get('id') + '.mp3')) {
+                        source = FileSystem.documentDirectory + 'songs/' + song.get('id') + '.mp3';
+                    }
                     // Populate all the properties the Player needs for each song.
                     return {
                         title: song.get('title'),
                         artist: collection.get('title'),
                         artwork: song.get('field_image')?.get('uri')?.url,
-                        url: song.get('field_full_song').get('uri')?.url,
+                        url: source,
                         id: song.get('id'),
                     };
                 })
@@ -94,7 +101,7 @@ const Collection = (props) => {
                 setItems(content);
             }
         }
-    }, [userData]);
+    }, [userData, downloads]);
 
     // Set the content for the screen.
     let songDataContent = null;
