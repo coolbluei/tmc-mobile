@@ -4,14 +4,24 @@ import { faHome, faCog, faMusic, faWifi, faUser } from "@fortawesome/pro-solid-s
 import Styles from "../styles";
 import { useNavigation } from "@react-navigation/native";
 import { useAtom } from "jotai";
-import { apiAtom, offlineAtom } from "../storage/atoms";
+import { apiAtom, offlineAtom, userDataAtom } from "../storage/atoms";
+import Entity from "../drupal/Entity";
 
 const Navbar = () => {
 
     const [api] = useAtom(apiAtom);
     const [offline] = useAtom(offlineAtom);
+    const [userData] = useAtom(userDataAtom);
 
     const navigation = useNavigation();
+
+    const user = new Entity(userData);
+
+    let dashboardUrl = 'https://themusicclass.com/app/user/home';
+
+    if(user.get('dashboard_link')) {
+        dashboardUrl = user.get('dashboard_link');
+    }
 
     let content = (
         <View style={Styles.navbarItems}>
@@ -32,7 +42,7 @@ const Navbar = () => {
                     <FontAwesomeIcon icon={faMusic} size={24} style={Styles.navbarItem} />
                 </TouchableOpacity>
     
-                <TouchableOpacity onPress={() => Linking.openURL(`https://themusicclass.com/app/user/home`)}>
+                <TouchableOpacity onPress={() => Linking.openURL(dashboardUrl)}>
                     <FontAwesomeIcon icon={faCog} size={24} style={Styles.navbarItem} />
                 </TouchableOpacity>
     
