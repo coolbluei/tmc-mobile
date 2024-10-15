@@ -7,10 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import ApiProvider from './components/ApiProvider';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
+import TrackPlayer from 'react-native-track-player';
 
 export default function App() {
 
   const providerStore = createStore();
+  TrackPlayer.registerPlaybackService(() => require('./TrackPlayerService'));
 
   return (
     <Provider store={providerStore}>
