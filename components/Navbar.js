@@ -1,4 +1,5 @@
 import { Linking, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHome, faCog, faMusic, faWifi, faUser } from "@fortawesome/pro-solid-svg-icons";
 import Styles from "../styles";
@@ -13,13 +14,20 @@ const Navbar = () => {
     const [offline] = useAtom(offlineAtom);
     const [userData] = useAtom(userDataAtom);
 
+    const [user, setUser] = useState();
+
     const navigation = useNavigation();
 
-    const user = new Entity(userData);
+    useEffect(() => {
+        if(userData instanceof Object && userData.hasOwnProperty('data')) {
+            const entity = new Entity(userData);
+            setUser(entity);
+        }
+    }, [userData]);
 
     let dashboardUrl = 'https://themusicclass.com/app/user/home';
 
-    if(user.get('dashboard_link')) {
+    if(user instanceof Entity && user.get('dashboard_link')) {
         dashboardUrl = user.get('dashboard_link');
     }
 
