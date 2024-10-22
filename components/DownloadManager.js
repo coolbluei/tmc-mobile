@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAtom } from 'jotai';
-import { downloadsAtom, downloadQueueAtom, debugModeAtom, updateDownloadsAtom } from '../storage/atoms';
+import { downloadsAtom, downloadQueueAtom, updateDownloadsAtom } from '../storage/atoms';
 import * as FileSystem from 'expo-file-system';
 import { ActivityIndicator, Text, Modal, View } from "react-native";
 import Styles from '../styles';
@@ -10,54 +10,53 @@ const DownloadManager = () => {
     const [downloads, setDownloads] = useAtom(downloadsAtom);
     const [updateDownloads, setUpdateDownloads] = useAtom(updateDownloadsAtom);
     const [downloadQueue, setDownloadQueue] = useAtom(downloadQueueAtom);
-    const [debugMode] = useAtom(debugModeAtom);
 
     const [isDownloading, setIsDownloading] = useState(false);
-    const [debugErrors, setDebugErrors] = useState();
-
-
-    const removeSongFromDownloadQueue = () => {
-        // Make a mutable copy of the downloadQueue state variable.
-        let queue = [...downloadQueue];
-
-        // Remove the first item.
-        queue.shift();
-
-        // Set the new queue to the downloadQueue state variable.
-        setDownloadQueue(queue);
-
-        // Set some debug info.
-        setDebugErrors(queue.toString());
-    };
+    const [downloadsInProgress, setDownloadsInProgress] = useState([]);
+    const [downloadComplete, setDownloadComplete] = useState(false);
 
     const downloadProgress = (progress) => {
         // If we have finished downloading the file...
         if(progress.totalBytesWritten === progress.totalBytesExpectedToWrite) {
-            // Remove it from the queue.
-            removeSongFromDownloadQueue();
+            setDownloadComplete(true);
         }
     };
 
     const downloadNextSong = async () => {
         try {
-            console.log('DownloadNextSong running...');
-            // Get the first song in the queue.
-            const song = downloadQueue[0];
+            // Get the next index. The next index is conveniently the same as the length of the downloadsInProgress array.
+            let nextIndex = downloadsInProgress.length;
 
-            // If the song isn't already downloaded...
-            if(downloads.includes(song.get('id') + '.mp3') === false) {
-                // Download the song.
-                await FileSystem.createDownloadResumable(song.get('field_full_song').get('uri').url, FileSystem.documentDirectory + 'songs/' + song.get('id') + '.mp3', {}, downloadProgress).downloadAsync();
-            } else {
-                // Otherwise, just remove it from the queue.
-                removeSongFromDownloadQueue();
-            }
+            // Get the first song in the queue.
+            const song = downloadQueue[nextIndex];
+            setDownloadsInProgress([...downloadsInProgress, song]);
+
+            console.log(`Downloading ${song.get('title')}`);
+            setDownloadComplete(false);
+            const downloadResumable = FileSystem.createDownloadResumable(song.get('field_full_song').get('uri').url, FileSystem.documentDirectory + 'songs/' + song.get('id') + '.mp3', {}, downloadProgress);
+            // Download the song.
+            await downloadResumable.downloadAsync();
         } catch (e) {
             console.log('DownloadNextSong:', e);
             setIsDownloading(false);
-            setDebugErrors(`Download Queue Length: ${downloadQueue.length} Error Message: ${e}`);
+            setUpdateDownloads(true);
+            setDownloadQueue([]);
+            setDownloadComplete(true);
         }
     };
+
+    // React to a download completing.
+    useEffect(() => {
+        // If the download is complete...
+        if(downloadComplete) {
+            downloadNextSong();
+        }
+
+        // If all the downloads are complete...
+        if(downloadsInProgress.length === downloadQueue.length) {
+            setUpdateDownloads(true);
+        }
+    }, [downloadComplete]);
 
     // React to the downloadQueue being updated.
     useEffect(() => {
@@ -65,6 +64,9 @@ const DownloadManager = () => {
         if(downloadQueue.length === 0) {
             // set the isDownloading state.
             setIsDownloading(false);
+
+            // Reset the downloadsInProgress Array.
+            setDownloadsInProgress([]);
 
             // Trigger the downloads list to update.
             setUpdateDownloads(true);
@@ -86,35 +88,20 @@ const DownloadManager = () => {
                 // Then update the downloads state.
                 setDownloads(data);
 
-                setDebugErrors('Downloads: ' + data.toString());
-
                 // And unset the updateDownloads trigger.
                 setUpdateDownloads(false);
             }).catch((e) => {
-                setDebugErrors(e.toString());
+                console.log('updateDownloads:', e);
             });
         }
     }, [updateDownloads]);
 
-    // Initialize the debugContent.
-    let debugContent = null;
-
-    // If we're in debugMode...
-    if(debugMode) {
-        // Output some debugErrors.
-        debugContent = (
-            <View style={Styles.highlight}>
-                <Text>{debugErrors}</Text>
-            </View>
-        )
-    }
-
     return (
         <View>
-            {debugContent}
             <Modal animationType="fade" transparent={true} visible={isDownloading}>
                 <View style={[Styles.container, Styles.modal]}>
                     <ActivityIndicator size="large" color="#ffffff" />
+                    <Text style={[Styles.title, Styles.textInverted]}>{downloadsInProgress.length} of {downloadQueue.length}</Text>
                 </View>
             </Modal>
         </View>
