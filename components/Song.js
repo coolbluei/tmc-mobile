@@ -106,17 +106,22 @@ const Song = (props) => {
     );
 
     let content = (
-        <View style={Styles.listItemContent}>
-            <Image style={Styles.listItemImage} src={props.data.artwork} />
+        <View>
+            <TouchableHighlight style={Styles.listItem} onPress={play}>
+                <View style={Styles.listItemContent}>
+                    <Image style={Styles.listItemImage} src={props.data.artwork} />
 
-            <Text style={[Styles.title, Styles.listTitle]}>{props.data.title}</Text>
+                    <Text style={[Styles.title, Styles.listTitle]}>{props.data.title}</Text>
 
-            {downloadButton}
+                    {downloadButton}
 
-            <TouchableOpacity onPress={toggleFavorite}>
-                <FontAwesomeIcon size={24} icon={favoriteIcon} style={Styles.favorite} />
-            </TouchableOpacity>
+                    <TouchableOpacity onPress={toggleFavorite}>
+                        <FontAwesomeIcon size={24} icon={favoriteIcon} style={Styles.favorite} />
+                    </TouchableOpacity>
+                </View>
+            </TouchableHighlight>
         </View>
+
     );
 
     if(downloads.includes(props.data.id + '.mp3')) {
@@ -126,17 +131,22 @@ const Song = (props) => {
 
         content = (
             <GestureHandlerRootView>
-                <Swipeable renderRightActions={deleteButton}>
-                    <View style={Styles.listItemContent}>
-                        <Image style={Styles.listItemImage} src={props.data.artwork} />
+                <Swipeable dragOffsetFromRightEdge={100} renderRightActions={deleteButton}>
+                    <View>
+                        <TouchableHighlight style={Styles.listItem} onPress={play}>
 
-                        <Text style={[Styles.title, Styles.listTitle]}>{props.data.title}</Text>
+                            <View style={Styles.listItemContent}>
+                                <Image style={Styles.listItemImage} src={props.data.artwork} />
 
-                        {downloadButton}
+                                <Text style={[Styles.title, Styles.listTitle]}>{props.data.title}</Text>
 
-                        <TouchableOpacity onPress={toggleFavorite}>
-                            <FontAwesomeIcon size={24} icon={favoriteIcon} style={Styles.favorite} />
-                        </TouchableOpacity>
+                                {downloadButton}
+
+                                <TouchableOpacity onPress={toggleFavorite}>
+                                    <FontAwesomeIcon size={24} icon={favoriteIcon} style={Styles.favorite} />
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableHighlight>
                     </View>
                 </Swipeable>
             </GestureHandlerRootView>
@@ -144,11 +154,7 @@ const Song = (props) => {
     }
     
     return (
-        <View>
-            <TouchableHighlight style={Styles.listItem} onPress={play}>
-                {content}
-            </TouchableHighlight>
-        </View>
+        content
     );
 };
 

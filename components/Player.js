@@ -44,8 +44,12 @@ const Player = () => {
     const beginPlayback = async () => {
         if(tracks.length > 0) {
             try {
+                await TrackPlayer.reset();
                 await TrackPlayer.add(tracks);
-                await TrackPlayer.play();
+                if(typeof index === 'number') {
+                    await TrackPlayer.skip(index);
+                }
+                TrackPlayer.play();
             } catch (error) { 
                 console.log(error); 
             }
@@ -60,9 +64,7 @@ const Player = () => {
     });
     
     const gettrackdata = async () => {
-        const trackIndex = await TrackPlayer.getActiveTrackIndex();
         const trackObject = await TrackPlayer.getActiveTrack();
-        setIndex(trackIndex);
         setTitle(trackObject?.title);
     };
     
@@ -131,9 +133,7 @@ const Player = () => {
     }, [loop]);
 
     useEffect(() => {
-        if(offline) {
-            TrackPlayer.reset();
-        }
+        TrackPlayer.reset();
     }, [offline]);
 
     let playPauseButton = <FontAwesomeIcon icon={faPlay} size={24} />;

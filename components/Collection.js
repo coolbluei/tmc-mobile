@@ -59,13 +59,17 @@ const Collection = (props) => {
     );
 
     let content = (
-        <View style={Styles.listItemContent}>
-            <Image style={Styles.listItemImage} src={props.data.get('field_image').get('uri').url} />
+        <View>
+            <TouchableOpacity style={Styles.listItem} onPress={() => navigation.navigate('Collection', { collectionId: props.data.get('id') })}>
+                <View style={Styles.listItemContent}>
+                    <Image style={Styles.listItemImage} src={props.data.get('field_image').get('uri').url} />
 
-            <Text style={[Styles.title, Styles.listTitle]}>{props.data.get('title')}</Text>
+                    <Text style={[Styles.title, Styles.listTitle]}>{props.data.get('title')}</Text>
 
-            {downloadButton}
-        </View>
+                    {downloadButton}
+                </View>
+            </TouchableOpacity>
+        </View>     
     );
 
     if(isDownloaded) {
@@ -75,13 +79,17 @@ const Collection = (props) => {
 
         content = (
             <GestureHandlerRootView>
-                <Swipeable renderRightActions={deleteButton}>
-                    <View style={Styles.listItemContent}>
-                        <Image style={Styles.listItemImage} src={props.data.get('field_image').get('uri').url} />
+                <Swipeable dragOffsetFromRightEdge={100} renderRightActions={deleteButton}>
+                    <View>
+                        <TouchableOpacity style={Styles.listItem} onPress={() => navigation.navigate('Collection', { collectionId: props.data.get('id') })}>
+                            <View style={Styles.listItemContent}>
+                                <Image style={Styles.listItemImage} src={props.data.get('field_image').get('uri').url} />
 
-                        <Text style={[Styles.title, Styles.listTitle]}>{props.data.get('title')}</Text>
+                                <Text style={[Styles.title, Styles.listTitle]}>{props.data.get('title')}</Text>
 
-                        {downloadButton}
+                                {downloadButton}
+                            </View>
+                        </TouchableOpacity>
                     </View>
                 </Swipeable>
             </GestureHandlerRootView>
@@ -89,11 +97,7 @@ const Collection = (props) => {
     }
 
     return (
-        <View>
-            <TouchableOpacity style={Styles.listItem} onPress={() => navigation.navigate('Collection', { collectionId: props.data.get('id') })}>
-                {content}
-            </TouchableOpacity>
-        </View>
+        content
     );
 };
 
